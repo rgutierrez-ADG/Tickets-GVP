@@ -187,27 +187,100 @@ button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: tra
 }
 
 /* Sheet cards grid */
-.sheets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sheets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (min-width: 600px) { .sheets-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .sheet-card {
-  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
-  padding: 16px 14px; cursor: pointer; transition: all .15s;
-  border-left-width: 5px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 16px 16px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp .35s ease both;
 }
-.sheet-card:active { border-color: var(--accent-bd); transform: scale(.97); }
-.sheet-card.freq-diario { border-left-color: #B34033; }
-.sheet-card.freq-mensual { border-left-color: #B34033; }
-.sheet-card.freq-bimestral { border-left-color: #7B4F9B; background: rgba(123,79,155,.04); }
-.sheet-card.freq-trimestral { border-left-color: #2E6FB8; background: rgba(46,111,184,.04); }
-.sheet-card.freq-semestral { border-left-color: #4A8556; background: rgba(74,133,86,.04); }
+.sheet-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+}
+.sheet-card.freq-diario::before  { background: linear-gradient(90deg,#B34033,#D4634A); }
+.sheet-card.freq-mensual::before { background: linear-gradient(90deg,#B34033,#D4634A); }
+.sheet-card.freq-bimestral::before  { background: linear-gradient(90deg,#7B4F9B,#A07DC0); }
+.sheet-card.freq-trimestral::before { background: linear-gradient(90deg,#2E6FB8,#5A9ED6); }
+.sheet-card.freq-semestral::before  { background: linear-gradient(90deg,#4A8556,#72B07A); }
+.sheet-card:active { transform: scale(.96); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+@media (hover:hover) { .sheet-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.10); border-color: var(--accent-bd); } }
+
 .sheet-card .freq {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-d);
-  display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text-d);
+  text-transform: uppercase; letter-spacing: .08em;
+  display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
 }
-.sheet-card .freq .dot { width: 7px; height: 7px; border-radius: 50%; }
-.sheet-card .sname { font-family: 'Instrument Serif', serif; font-size: 17px; line-height: 1.2; margin-bottom: 4px; }
-.sheet-card .sitems { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-d); }
+.sheet-card .freq .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sheet-card .sname {
+  font-family: 'Instrument Serif', serif; font-size: 18px; line-height: 1.2;
+  margin-bottom: 10px; color: var(--text);
+}
+.sheet-card .sitems {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--text-d); display: flex; align-items: center; gap: 4px;
+}
+.sheet-card .sitems::before { content: ''; display: inline-block; width: 12px; height: 1px; background: var(--border-s); }
+
+/* Home hero */
+.home-hero {
+  background: #1B1915;
+  border-radius: 16px;
+  padding: 24px 20px 22px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.home-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: -20px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(122,99,50,.15);
+  pointer-events: none;
+}
+.home-hero .hero-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: rgba(255,255,255,.35); margin-bottom: 8px;
+}
+.home-hero h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: 26px; line-height: 1.15;
+  color: #fff; margin-bottom: 6px;
+}
+.home-hero .hero-sub {
+  font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 16px;
+}
+.home-hero .hero-stats {
+  display: flex; gap: 16px;
+}
+.home-hero .hero-stat {
+  display: flex; flex-direction: column; gap: 1px;
+}
+.home-hero .hero-stat-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px; font-weight: 600;
+  color: var(--accent-l); line-height: 1;
+}
+.home-hero .hero-stat-lbl {
+  font-size: 10px; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .06em;
+}
+.home-hero .hero-divider {
+  width: 1px; background: rgba(255,255,255,.1); align-self: stretch;
+}
 
 /* Attachments */
 .attach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1267,7 +1340,7 @@ function render() {
       h('img', {src:LOGO_B64, style:{width:'36px',height:'36px',borderRadius:'6px',objectFit:'cover'}}),
       h('div', null,
         h('span', {className:'name'}, 'Maniagro'),
-        h('span', {className:'badge', style:{marginLeft:'6px'}}, 'GVP'),
+        h('span', {className:'badge', style:{marginLeft:'6px'}}, 'GVP v2'),
       ),
     ),
     h('div', {className:'header-actions'},
@@ -1286,31 +1359,52 @@ function render() {
   // ══ HOME ══
   if (state.view === 'home') {
     content.className = 'content fade-up';
-    content.appendChild(h('h1', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'30px',marginBottom:'4px',lineHeight:'1.15'}}, 'Control de Vidrios y Plásticos'));
-    content.appendChild(h('p', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'20px'}}, 'R-SIG-GVP 01'));
+
+    // ── Hero ──
+    if (state.sheets.length > 0) {
+      const totalItems = state.sheets.reduce((a,s) => a + s.items.length, 0);
+      const hero = h('div', {className:'home-hero'});
+      hero.appendChild(h('div', {className:'hero-label'}, 'R-SIG-GVP 01 · Maniagro Argentina'));
+      hero.appendChild(h('h1', null, 'Control de\nVidrios y Plásticos'));
+      hero.appendChild(h('div', {className:'hero-sub'}, 'Registros de inspección y trazabilidad'));
+      const stats = h('div', {className:'hero-stats'});
+      const s1 = h('div',{className:'hero-stat'});
+      s1.appendChild(h('div',{className:'hero-stat-val'}, String(state.sheets.length)));
+      s1.appendChild(h('div',{className:'hero-stat-lbl'}, 'Formularios'));
+      const div1 = h('div',{className:'hero-divider'});
+      const s2 = h('div',{className:'hero-stat'});
+      s2.appendChild(h('div',{className:'hero-stat-val'}, String(totalItems)));
+      s2.appendChild(h('div',{className:'hero-stat-lbl'}, 'Ítems totales'));
+      stats.appendChild(s1); stats.appendChild(div1); stats.appendChild(s2);
+      hero.appendChild(stats);
+      content.appendChild(hero);
+
+      // ── Toolbar ──
+      const toolbar = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}});
+      toolbar.appendChild(h('span', {style:{fontSize:'12px',fontWeight:'600',color:'var(--text-m)'}}, 'Seleccioná un formulario'));
+      toolbar.appendChild(h('button', {className:'btn btn-s btn-ghost', onClick:loadFixedCSVs, disabled:state.loading, style:{fontSize:'11px'}}, state.loading ? '⏳' : '↻'));
+      content.appendChild(toolbar);
+    }
 
     if (state.sheets.length === 0) {
-      const empty = h('div', {className:'card', style:{textAlign:'center',padding:'40px 20px'}});
-      empty.appendChild(h('div', {style:{fontSize:'44px',marginBottom:'8px'}}, state.loading ? '⏳' : '📋'));
-      empty.appendChild(h('div', {style:{fontSize:'16px',fontWeight:'600',marginBottom:'4px'}},
+      // Hero vacío
+      const hero = h('div', {className:'home-hero', style:{marginBottom:'16px'}});
+      hero.appendChild(h('div', {className:'hero-label'}, 'R-SIG-GVP 01 · Maniagro Argentina'));
+      hero.appendChild(h('h1', null, 'Control de\nVidrios y Plásticos'));
+      hero.appendChild(h('div', {className:'hero-sub'}, 'Cargando formularios desde el repositorio...'));
+      content.appendChild(hero);
+
+      const empty = h('div', {className:'card', style:{textAlign:'center',padding:'32px 20px'}});
+      empty.appendChild(h('div', {style:{fontSize:'36px',marginBottom:'8px'}}, state.loading ? '⏳' : '📋'));
+      empty.appendChild(h('div', {style:{fontSize:'15px',fontWeight:'600',marginBottom:'4px'}},
         state.loading ? 'Cargando formularios...' : 'No se encontraron formularios'));
       empty.appendChild(h('div', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'20px',lineHeight:'1.5'}},
-        state.loading
-          ? 'Trayendo los CSV desde el repositorio.'
-          : 'Verificá la conexión a internet e intentá recargar.'));
+        state.loading ? 'Trayendo los CSV desde el repositorio.' : 'Verificá la conexión a internet e intentá recargar.'));
       if (!state.loading) {
-        const btn = h('button', {className:'btn btn-accent', onClick:loadFixedCSVs}, '↻ Reintentar');
-        empty.appendChild(btn);
+        empty.appendChild(h('button', {className:'btn btn-accent', onClick:loadFixedCSVs}, '↻ Reintentar'));
       }
       content.appendChild(empty);
     } else {
-      // Sheets grid
-      const reloadRow = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px',gap:'8px'}});
-      reloadRow.appendChild(h('span', {className:'mono', style:{fontSize:'11px',color:'var(--text-d)'}}, state.sheets.length+' hojas'));
-      const btnGroup = h('div', {style:{display:'flex',gap:'6px'}});
-      btnGroup.appendChild(h('button', {className:'btn btn-s btn-ghost', onClick:loadFixedCSVs, disabled:state.loading}, state.loading ? '⏳ Actualizando...' : '↻ Actualizar'));
-      reloadRow.appendChild(btnGroup);
-      content.appendChild(reloadRow);
 
       const grid = h('div', {className:'sheets-grid'});
       state.sheets.forEach((s, i) => {
@@ -1330,13 +1424,15 @@ function render() {
         else if (isDiario) { freqClass = 'freq-diario'; dotColor = '#B34033'; }
         else { freqClass = 'freq-diario'; dotColor = '#B34033'; }
 
-        const card = h('div', {className:'sheet-card '+freqClass, style:{animationDelay:i*.04+'s'}, onClick:()=>{
+        const card = h('div', {className:'sheet-card '+freqClass, style:{animationDelay:(i*.06)+'s'}, onClick:()=>{
           state.activeSheet = s; state.view='fill'; state.attachedFiles=[]; state.controlDate=new Date().toISOString().slice(0,10); state.controlTime=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); state.generalObs=''; state.signatureData=null; render();
-        }},
-          h('div', {className:'freq'}, h('span',{className:'dot',style:{background:dotColor}}), s.meta.frequency||'—'),
-          h('div', {className:'sname'}, displayName(s.name)),
-          h('div', {className:'sitems'}, s.items.length+' ítems'),
-        );
+        }});
+        card.appendChild(h('div', {className:'freq'}, h('span',{className:'dot',style:{background:dotColor}}), (s.meta.frequency||'—').toUpperCase()));
+        card.appendChild(h('div', {className:'sname'}, displayName(s.name)));
+        const footer = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center'}});
+        footer.appendChild(h('div', {className:'sitems'}, s.items.length+' ítems'));
+        footer.appendChild(h('span', {style:{fontSize:'16px',color:'var(--text-d)',lineHeight:'1'}}, '→'));
+        card.appendChild(footer);
         grid.appendChild(card);
       });
       content.appendChild(grid);
