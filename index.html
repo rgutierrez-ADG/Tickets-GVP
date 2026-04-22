@@ -9,44 +9,48 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>FormVault GVP — Control de Vidrios y Plásticos</title>
 <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRm9ybVZhdWx0IEdWUCIsInNob3J0X25hbWUiOiJGb3JtVmF1bHQiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFCMTkxNSIsInRoZW1lX2NvbG9yIjoiIzFCMTkxNSJ9">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F2EFEA;
+  /* Paleta Maniagro — azul #1B5E99, verde #1B6B35, lima #97C459 */
+  --bg: #EBF0F7;
   --surface: #FFFFFF;
-  --surface-alt: #F8F7F4;
+  --surface-alt: #F2F6FB;
   --card: #FFFFFF;
-  --border: #DDD8CE;
-  --border-s: #C8C2B6;
-  --border-f: #7A6332;
-  --accent: #7A6332;
-  --accent-l: #9E8550;
-  --accent-bg: rgba(122,99,50,.06);
-  --accent-bd: rgba(122,99,50,.2);
-  --text: #2C2820;
-  --text-m: #5C554A;
-  --text-mu: #918B7F;
-  --text-d: #B5AFA3;
-  --ok: #4A8556;
-  --ok-bg: rgba(74,133,86,.08);
+  --border: #C8D8EA;
+  --border-s: #A8C0D8;
+  --border-f: #1B5E99;
+  --accent: #1B5E99;
+  --accent-l: #2E7FCC;
+  --accent-bg: rgba(27,94,153,.07);
+  --accent-bd: rgba(27,94,153,.25);
+  --text: #0F2A45;
+  --text-m: #2D4E6E;
+  --text-mu: #5A7A96;
+  --text-d: #90AABF;
+  --ok: #1B6B35;
+  --ok-bg: rgba(27,107,53,.08);
   --nc: #B34033;
   --nc-bg: rgba(179,64,51,.08);
-  --na: #918B7F;
+  --na: #5A7A96;
   --white: #FFF;
-  --radius: 10px;
+  --radius: 12px;
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-tap-highlight-color: transparent; }
 body {
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  /* Aptos no está en Google Fonts — usamos Nunito Sans que es idéntica en proporciones,
+     con fallback a Calibri/Segoe UI que son las fuentes del sistema donde existe Aptos */
+  font-family: 'Nunito Sans', Calibri, 'Segoe UI', -apple-system, sans-serif;
+  font-size: 17px;
   background: var(--bg); color: var(--text);
   min-height: 100vh; min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
 input, select, textarea {
-  font-family: 'DM Sans', sans-serif; font-size: 16px;
+  font-family: 'Nunito Sans', Calibri, 'Segoe UI', sans-serif; font-size: 17px;
   background: var(--surface); color: var(--text);
   border: 1.5px solid var(--border); border-radius: 8px;
   padding: 12px 14px; width: 100%; outline: none;
@@ -79,19 +83,21 @@ button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: tra
 /* Layout */
 .app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 .header {
-  background: #1B1915; color: var(--white);
+  background: linear-gradient(135deg, #1B5E99 0%, #1B6B35 100%);
+  color: var(--white);
   padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top));
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 50;
+  box-shadow: 0 2px 12px rgba(27,94,153,.3);
 }
-.header-logo { display: flex; align-items: center; gap: 10px; }
+.header-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .header-logo .icon {
-  width: 32px; height: 32px; border-radius: 8px; background: var(--accent);
+  width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.2);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Instrument Serif', serif; font-size: 16px; font-weight: 400; color: var(--white);
+  font-family: 'Instrument Serif', serif; font-size: 16px; color: var(--white);
 }
-.header-logo .name { font-size: 16px; font-weight: 700; }
-.header-logo .badge { font-size: 9px; color: rgba(255,255,255,.4); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.header-logo .name { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.header-logo .badge { font-size: 10px; color: rgba(255,255,255,.55); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-left: 6px; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
 .content { flex: 1; padding: 16px; padding-bottom: calc(16px + var(--safe-b)); max-width: 800px; width: 100%; margin: 0 auto; }
@@ -99,17 +105,20 @@ button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: tra
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-weight: 600; font-size: 13px; padding: 10px 18px; border-radius: 8px;
+  font-family: 'Nunito Sans', Calibri, 'Segoe UI', sans-serif;
+  font-weight: 700; font-size: 15px; padding: 12px 20px; border-radius: 10px;
   border: none; transition: all .15s; white-space: nowrap;
-  touch-action: manipulation;
+  touch-action: manipulation; letter-spacing: .01em;
 }
-.btn-s { padding: 7px 12px; font-size: 12px; }
+.btn-s { padding: 9px 14px; font-size: 13px; }
 .btn-full { width: 100%; }
-.btn-accent { background: var(--accent); color: var(--white); }
+.btn-accent { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(27,94,153,.25); }
+.btn-accent:active { background: #154a7a; box-shadow: none; }
 .btn-default { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
-.btn-ghost { background: transparent; color: var(--text-mu); padding: 6px 10px; }
-.btn-ok { background: var(--ok-bg); color: var(--ok); }
-.btn-nc { background: var(--nc-bg); color: var(--nc); }
+.btn-ghost { background: transparent; color: var(--text-mu); padding: 8px 12px; }
+.btn-ok { background: var(--ok); color: #fff; box-shadow: 0 2px 8px rgba(27,107,53,.2); }
+.btn-ok:active { background: #145228; }
+.btn-nc { background: var(--nc); color: #fff; }
 .btn:disabled { opacity: .4; pointer-events: none; }
 .btn:active { transform: scale(.97); }
 
@@ -176,8 +185,9 @@ button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: tra
 
 /* Section header */
 .section-header {
-  background: #1B1915; color: var(--white);
-  padding: 10px 14px; font-weight: 700; font-size: 13px;
+  background: linear-gradient(135deg, #1B5E99 0%, #1B6B35 100%);
+  color: var(--white);
+  padding: 10px 14px; font-weight: 700; font-size: 14px;
   letter-spacing: .01em; position: sticky; top: 56px; z-index: 10;
   display: flex; justify-content: space-between; align-items: center;
 }
@@ -191,95 +201,109 @@ button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: tra
 @media (min-width: 600px) { .sheets-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .sheet-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  border: none;
   border-radius: 14px;
   padding: 18px 16px 16px;
   cursor: pointer;
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s;
-  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  transition: transform .18s ease, box-shadow .18s ease;
+  box-shadow: 0 3px 12px rgba(0,0,0,.12);
   position: relative;
   overflow: hidden;
   animation: fadeUp .35s ease both;
+  color: #fff;
 }
-.sheet-card::before {
+.sheet-card.freq-diario   { background: linear-gradient(145deg,#B34033,#D4634A); }
+.sheet-card.freq-mensual  { background: linear-gradient(145deg,#B34033,#D4634A); }
+.sheet-card.freq-bimestral  { background: linear-gradient(145deg,#6B3F8A,#9B6BBF); }
+.sheet-card.freq-trimestral { background: linear-gradient(145deg,#1B5E99,#3A8FD4); }
+.sheet-card.freq-semestral  { background: linear-gradient(145deg,#1B6B35,#3A9E5A); }
+.sheet-card::after {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: 14px 14px 0 0;
+  top: -20px; right: -20px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  pointer-events: none;
 }
-.sheet-card.freq-diario::before  { background: linear-gradient(90deg,#B34033,#D4634A); }
-.sheet-card.freq-mensual::before { background: linear-gradient(90deg,#B34033,#D4634A); }
-.sheet-card.freq-bimestral::before  { background: linear-gradient(90deg,#7B4F9B,#A07DC0); }
-.sheet-card.freq-trimestral::before { background: linear-gradient(90deg,#2E6FB8,#5A9ED6); }
-.sheet-card.freq-semestral::before  { background: linear-gradient(90deg,#4A8556,#72B07A); }
-.sheet-card:active { transform: scale(.96); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-@media (hover:hover) { .sheet-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.10); border-color: var(--accent-bd); } }
+.sheet-card:active { transform: scale(.96); box-shadow: 0 1px 6px rgba(0,0,0,.15); }
+@media (hover:hover) { .sheet-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.18); } }
 
 .sheet-card .freq {
-  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text-d);
-  text-transform: uppercase; letter-spacing: .08em;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: rgba(255,255,255,.6);
+  text-transform: uppercase; letter-spacing: .1em;
   display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
 }
-.sheet-card .freq .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sheet-card .freq .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.7); flex-shrink: 0; }
 .sheet-card .sname {
-  font-family: 'Instrument Serif', serif; font-size: 18px; line-height: 1.2;
-  margin-bottom: 10px; color: var(--text);
+  font-family: 'Nunito Sans', Calibri, 'Segoe UI', sans-serif;
+  font-size: 20px; font-weight: 800; line-height: 1.15;
+  margin-bottom: 12px; color: #fff; letter-spacing: -.01em;
 }
 .sheet-card .sitems {
   font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  color: var(--text-d); display: flex; align-items: center; gap: 4px;
+  color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 4px;
 }
-.sheet-card .sitems::before { content: ''; display: inline-block; width: 12px; height: 1px; background: var(--border-s); }
+.sheet-card .sitems::before { content: ''; display: inline-block; width: 12px; height: 1px; background: rgba(255,255,255,.35); }
 
 /* Home hero */
 .home-hero {
-  background: #1B1915;
+  background: linear-gradient(135deg, #1B5E99 0%, #1B6B35 100%);
   border-radius: 16px;
-  padding: 24px 20px 22px;
+  padding: 26px 22px 24px;
   margin-bottom: 20px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(27,94,153,.25);
+}
+.home-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(151,196,89,.15);
+  pointer-events: none;
 }
 .home-hero::after {
   content: '';
   position: absolute;
-  bottom: -30px; right: -20px;
-  width: 120px; height: 120px;
+  bottom: -30px; left: 30%;
+  width: 100px; height: 100px;
   border-radius: 50%;
-  background: rgba(122,99,50,.15);
+  background: rgba(255,255,255,.05);
   pointer-events: none;
 }
 .home-hero .hero-label {
   font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-  text-transform: uppercase; letter-spacing: .12em;
-  color: rgba(255,255,255,.35); margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: rgba(255,255,255,.5); margin-bottom: 10px;
 }
 .home-hero h1 {
-  font-family: 'Instrument Serif', serif;
-  font-size: 26px; line-height: 1.15;
-  color: #fff; margin-bottom: 6px;
+  font-family: 'Nunito Sans', Calibri, 'Segoe UI', sans-serif;
+  font-size: 30px; font-weight: 800; line-height: 1.1;
+  color: #fff; margin-bottom: 6px; letter-spacing: -.02em;
+  white-space: pre-line;
 }
 .home-hero .hero-sub {
-  font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 16px;
+  font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 20px;
 }
 .home-hero .hero-stats {
-  display: flex; gap: 16px;
+  display: flex; gap: 20px; align-items: center;
 }
 .home-hero .hero-stat {
-  display: flex; flex-direction: column; gap: 1px;
+  display: flex; flex-direction: column; gap: 2px;
 }
 .home-hero .hero-stat-val {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 20px; font-weight: 600;
-  color: var(--accent-l); line-height: 1;
+  font-size: 24px; font-weight: 600;
+  color: #97C459; line-height: 1;
 }
 .home-hero .hero-stat-lbl {
-  font-size: 10px; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .06em;
+  font-size: 10px; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .07em;
 }
 .home-hero .hero-divider {
-  width: 1px; background: rgba(255,255,255,.1); align-self: stretch;
+  width: 1px; height: 32px; background: rgba(255,255,255,.15);
 }
 
 /* Attachments */
@@ -1431,7 +1455,7 @@ function render() {
         card.appendChild(h('div', {className:'sname'}, displayName(s.name)));
         const footer = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center'}});
         footer.appendChild(h('div', {className:'sitems'}, s.items.length+' ítems'));
-        footer.appendChild(h('span', {style:{fontSize:'16px',color:'var(--text-d)',lineHeight:'1'}}, '→'));
+        footer.appendChild(h('span', {style:{fontSize:'18px',color:'rgba(255,255,255,.6)',lineHeight:'1'}}, '→'));
         card.appendChild(footer);
         grid.appendChild(card);
       });
