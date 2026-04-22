@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1B1915">
+<meta name="mobile-web-app-capable" content="yes">
+<title>FormVault GVP — Control de Vidrios y Plásticos</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRm9ybVZhdWx0IEdWUCIsInNob3J0X25hbWUiOiJGb3JtVmF1bHQiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFCMTkxNSIsInRoZW1lX2NvbG9yIjoiIzFCMTkxNSJ9">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F2EFEA;
+  --surface: #FFFFFF;
+  --surface-alt: #F8F7F4;
+  --card: #FFFFFF;
+  --border: #DDD8CE;
+  --border-s: #C8C2B6;
+  --border-f: #7A6332;
+  --accent: #7A6332;
+  --accent-l: #9E8550;
+  --accent-bg: rgba(122,99,50,.06);
+  --accent-bd: rgba(122,99,50,.2);
+  --text: #2C2820;
+  --text-m: #5C554A;
+  --text-mu: #918B7F;
+  --text-d: #B5AFA3;
+  --ok: #4A8556;
+  --ok-bg: rgba(74,133,86,.08);
+  --nc: #B34033;
+  --nc-bg: rgba(179,64,51,.08);
+  --na: #918B7F;
+  --white: #FFF;
+  --radius: 10px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+input, select, textarea {
+  font-family: 'DM Sans', sans-serif; font-size: 16px;
+  background: var(--surface); color: var(--text);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; width: 100%; outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-f);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+textarea { resize: vertical; min-height: 60px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23918B7F' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+::placeholder { color: var(--text-d); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 2px; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+@keyframes spin { to { transform:rotate(360deg) } }
+@keyframes slideUp { from { transform:translateY(100%) } to { transform:translateY(0) } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.fade-up { animation: fadeUp .35s ease both; }
+
+/* Layout */
+.app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.header {
+  background: #1B1915; color: var(--white);
+  padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top));
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.header-logo { display: flex; align-items: center; gap: 10px; }
+.header-logo .icon {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif; font-size: 16px; font-weight: 400; color: var(--white);
+}
+.header-logo .name { font-size: 16px; font-weight: 700; }
+.header-logo .badge { font-size: 9px; color: rgba(255,255,255,.4); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.content { flex: 1; padding: 16px; padding-bottom: calc(16px + var(--safe-b)); max-width: 800px; width: 100%; margin: 0 auto; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-weight: 600; font-size: 13px; padding: 10px 18px; border-radius: 8px;
+  border: none; transition: all .15s; white-space: nowrap;
+  touch-action: manipulation;
+}
+.btn-s { padding: 7px 12px; font-size: 12px; }
+.btn-full { width: 100%; }
+.btn-accent { background: var(--accent); color: var(--white); }
+.btn-default { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+.btn-ghost { background: transparent; color: var(--text-mu); padding: 6px 10px; }
+.btn-ok { background: var(--ok-bg); color: var(--ok); }
+.btn-nc { background: var(--nc-bg); color: var(--nc); }
+.btn:disabled { opacity: .4; pointer-events: none; }
+.btn:active { transform: scale(.97); }
+
+/* Cards */
+.card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 18px; transition: all .15s;
+}
+.card-hover:active { border-color: var(--accent-bd); transform: scale(.98); }
+
+/* Toast */
+.toast {
+  position: fixed; top: max(16px, env(safe-area-inset-top, 16px)); left: 16px; right: 16px;
+  z-index: 999; padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; text-align: center;
+  animation: fadeUp .3s ease; max-width: 400px; margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+}
+.toast-ok { background: var(--ok-bg); color: var(--ok); border: 1px solid rgba(74,133,86,.15); }
+.toast-err { background: var(--nc-bg); color: var(--nc); border: 1px solid rgba(179,64,51,.15); }
+
+/* Status pills */
+.status-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: transparent; color: var(--text-d);
+  transition: all .15s; min-width: 44px; min-height: 44px;
+  touch-action: manipulation; cursor: pointer;
+}
+.status-pill.active-ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.status-pill.active-nc { border-color: var(--nc); background: var(--nc-bg); color: var(--nc); }
+.status-pill.active-na { border-color: var(--na); background: rgba(145,139,127,.08); color: var(--na); }
+.status-pill:active { transform: scale(.93); }
+
+/* Progress */
+.progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-l)); border-radius: 3px; transition: width .3s; }
+
+/* Inspection row */
+.inspect-row {
+  padding: 14px 12px; border-bottom: 1px solid rgba(0,0,0,.04);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.inspect-row:nth-child(even) { background: var(--surface-alt); }
+.inspect-row .row-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.inspect-row .row-info { flex: 1; min-width: 0; }
+.inspect-row .row-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-d);
+  background: var(--accent-bg); padding: 2px 6px; border-radius: 4px;
+  display: inline-block; margin-right: 6px;
+}
+.inspect-row .row-equipo { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.inspect-row .row-sector { font-size: 11px; color: var(--text-mu); margin-top: 2px; }
+.inspect-row .row-tipo {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-d);
+  display: inline-block; margin-top: 2px;
+}
+.inspect-row .status-group { display: flex; gap: 6px; flex-shrink: 0; }
+.inspect-row .obs-input {
+  font-size: 13px; padding: 8px 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.inspect-row .obs-input:focus { border-color: var(--border-f); }
+
+/* Section header */
+.section-header {
+  background: #1B1915; color: var(--white);
+  padding: 10px 14px; font-weight: 700; font-size: 13px;
+  letter-spacing: .01em; position: sticky; top: 56px; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-header .count {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: rgba(255,255,255,.4); font-weight: 400;
+}
+
+/* Sheet cards grid */
+.sheets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (min-width: 600px) { .sheets-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.sheet-card {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 16px 14px; cursor: pointer; transition: all .15s;
+  border-left-width: 5px;
+}
+.sheet-card:active { border-color: var(--accent-bd); transform: scale(.97); }
+.sheet-card.freq-diario { border-left-color: #B34033; }
+.sheet-card.freq-mensual { border-left-color: #B34033; }
+.sheet-card.freq-bimestral { border-left-color: #7B4F9B; background: rgba(123,79,155,.04); }
+.sheet-card.freq-trimestral { border-left-color: #2E6FB8; background: rgba(46,111,184,.04); }
+.sheet-card.freq-semestral { border-left-color: #4A8556; background: rgba(74,133,86,.04); }
+.sheet-card .freq {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-d);
+  display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+}
+.sheet-card .freq .dot { width: 7px; height: 7px; border-radius: 50%; }
+.sheet-card .sname { font-family: 'Instrument Serif', serif; font-size: 17px; line-height: 1.2; margin-bottom: 4px; }
+.sheet-card .sitems { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-d); }
+
+/* Attachments */
+.attach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (min-width: 500px) { .attach-grid { grid-template-columns: repeat(4, 1fr); } }
+.attach-item {
+  position: relative; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); background: var(--surface-alt);
+}
+.attach-item img { width: 100%; height: 70px; object-fit: cover; display: block; }
+.attach-item .attach-placeholder {
+  width: 100%; height: 70px; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; background: var(--accent-bg);
+}
+.attach-item .attach-name {
+  font-size: 9px; padding: 4px 6px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; color: var(--text-m);
+}
+.attach-item .attach-remove {
+  position: absolute; top: 3px; right: 3px; width: 22px; height: 22px;
+  border-radius: 50%; background: rgba(0,0,0,.6); color: white; border: none;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+/* Bottom action bar */
+.bottom-bar {
+  position: sticky; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1.5px solid var(--border);
+  padding: 12px 16px; padding-bottom: calc(12px + var(--safe-b));
+  display: flex; gap: 8px; z-index: 40;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.05);
+}
+
+/* Config sections */
+.config-section { margin-bottom: 14px; }
+.config-section .config-title {
+  font-size: 13px; font-weight: 700; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.config-label {
+  display: block; font-size: 10px; font-weight: 600; color: var(--text-mu);
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em;
+}
+.config-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  color: var(--text-d); margin-top: 3px;
+}
+
+/* History */
+.history-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 5px; font-size: 12px;
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .5s linear infinite;
+}
+
+/* Mono */
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* Script */
+.script-block {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6;
+  color: var(--text-m); background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px; overflow-x: auto; white-space: pre-wrap;
+  max-height: 50vh;
+}
+
+/* Drive badge */
+.drive-badge {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  display: flex; align-items: center; gap: 4px;
+}
+.drive-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<!-- External libs loaded on demand -->
+<script>
+// ═══════════════════════════════════════════════════
+// FormVault GVP — Standalone PWA
+// ═══════════════════════════════════════════════════
+
+const SCOPES = 'https://www.googleapis.com/auth/drive';
+const STATUS_OPT = ['Conforme','No Conforme','N/A'];
+const LOGO_B64 = 'data:image/jpeg;base64,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';
+
+const FIRMA_NATACHA_B64 = 'data:image/png;base64,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';
+
+// ── State ──
+const state = {
+  view: 'home', // home | fill | config | script
+  sheets: JSON.parse(localStorage.getItem('fv_sheets') || '[]'),
+  activeSheet: null,
+  inspector: localStorage.getItem('fv_inspector') || '',
+  controlDate: new Date().toISOString().slice(0,10),
+  controlTime: new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
+  generalObs: '',
+  signatureData: null,
+  attachedFiles: [],
+  history: JSON.parse(localStorage.getItem('fv_history') || '[]'),
+  config: JSON.parse(localStorage.getItem('fv_config') || '{}'),
+  token: null,
+  loading: false,
+  uploading: false,
+  toast: null,
+};
+
+function saveSheets() {
+  // Guardar hojas sin el estado de cada ítem (reset al cargar desde CSV)
+  const minimal = state.sheets.map(s => ({
+    name: s.name,
+    meta: s.meta,
+    items: s.items.map(it => ({
+      id: it.id, ubicacion: it.ubicacion, num: it.num,
+      sector: it.sector, equipo: it.equipo, tipo: it.tipo,
+      estado: '', observaciones: '',
+    })),
+  }));
+  try { localStorage.setItem('fv_sheets', JSON.stringify(minimal)); } catch(e) {}
+}
+
+// Ensure config defaults
+// ── Credenciales fijas (no se pierden aunque se limpie el localStorage) ──
+const DEFAULT_CLIENT_ID = '399944808776-ndb9l3rsnv17cbrteni11n0nrmgjve7n.apps.googleusercontent.com';
+const DEFAULT_FOLDER_ID  = '18KDbxt63cluSBl5rFDdSP7ZdiUzGPZPL';
+
+if (!state.config.clientId) state.config.clientId = DEFAULT_CLIENT_ID;
+if (!state.config.folderId) state.config.folderId = DEFAULT_FOLDER_ID;
+if (!state.config.email) state.config.email = '';
+if (!state.config.deadline) state.config.deadline = '09:00';
+if (!state.config.folderMap) state.config.folderMap = {}; // {sheetName: folderId}
+
+// Persistir defaults de inmediato (por si es primera vez)
+saveConfig();
+
+// ── Sincronización de configuración entre dispositivos ──
+// Importar config desde URL hash al abrir (e.g. ?fvconfig=base64...)
+(function importFromURL() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('fvconfig');
+    if (encoded) {
+      const json = JSON.parse(atob(encoded));
+      if (json.config) { state.config = {...state.config, ...json.config}; saveConfig(); }
+      if (json.inspector) { state.inspector = json.inspector; saveInspector(); }
+      if (json.history) { state.history = json.history; saveHistory(); }
+      // Limpiar URL para que no se reimporte al recargar
+      window.history.replaceState(null, '', window.location.pathname);
+      setTimeout(() => showToast('✓ Configuración importada desde enlace'), 500);
+    }
+  } catch(e) { console.warn('Error importando config desde URL:', e); }
+})();
+
+function exportConfigToFile() {
+  const data = { config: state.config, inspector: state.inspector, history: state.history };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'formvault-config-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('✓ Archivo de configuración descargado');
+}
+
+function importConfigFromFile() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = async (e) => {
+    try {
+      const text = await e.target.files[0].text();
+      const json = JSON.parse(text);
+      if (json.config) { state.config = {...state.config, ...json.config}; saveConfig(); }
+      if (json.inspector) { state.inspector = json.inspector; saveInspector(); }
+      if (json.history) { state.history = json.history; saveHistory(); }
+      showToast('✓ Configuración importada correctamente');
+      render();
+    } catch(err) { showToast('Error al leer el archivo', 'err'); }
+  };
+  input.click();
+}
+
+function shareConfigURL() {
+  const data = { config: state.config, inspector: state.inspector };
+  const encoded = btoa(JSON.stringify(data));
+  const url = window.location.origin + window.location.pathname + '?fvconfig=' + encoded;
+  if (navigator.share) {
+    navigator.share({ title: 'FormVault GVP — Config', url }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('✓ Enlace copiado al portapapeles'));
+  } else {
+    prompt('Copiá este enlace y abrilo en el otro dispositivo:', url);
+  }
+}
+
+// Clean display names: remove Diario-, Diaria-, Mensual, Trimestral prefixes
+function displayName(name) {
+  return name.replace(/^Diario[-\s]*/i,'').replace(/^Diaria[-\s]*/i,'').replace(/^Mensual[-\s]*/i,'').replace(/^Trimestral[-\s]*/i,'').trim() || name;
+}
+
+// Get folder for a specific sheet (falls back to general folder)
+// Hardcoded folder IDs per sheet
+const FIXED_FOLDERS = {
+  "Trimestral": "12_sPI8pZHgBUorhl4GccL77ooJGMo6p8",
+  "Mensual ": "1iZ3p9b5VSHmrseOUiMDatoCbMkFVZWlD",
+  "Diario-Blanchado": "1DkmsnSJrn-gMY1YccYMg9K1obO1SatdP",
+  "Diario-HPS1": "1ZaFYbXVvuuJDZTYur5-4ECTB_j5-2tib",
+  "Diario-HPS2": "1Rl8mEId5JipHK5K8gK9lkhMFf2XB-5Xh",
+  "Diaria-Depósitos": "1d3yK6PVdz2tlL-U9XSgTbqi7cPLY0QjO",
+  "Diario-Tostado-Pasta-Frito": "1ltSWK8XH9LACOcGrEND7YgGaJ4O8GMEj",
+  "Diario-Planta PE II": "1EtWnvY76lh4KaVWhtOxEqTO1Qd5bFzGi",
+  "Planta Tacc": "1msZpAigKWZIrfZGBhfAtWEiLlSOWLfRD",
+  "Planta Alérgenos": "1msZpAigKWZIrfZGBhfAtWEiLlSOWLfRD",
+  "Bimestral": "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe",
+  "Semestral": "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe",
+};
+const FIXED_GENERAL_FOLDER = "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe";
+
+// ── CSVs fijos hosteados junto al HTML (precargados desde el repo) ──
+const FIXED_CSVS = [
+  "gvp_Bimestral.csv",
+  "gvp_Trimestral.csv",
+  "gvp_Semestral.csv",
+  "gvp_Diario-Blanchado.csv",
+  "gvp_Diario-HPS1.csv",
+  "gvp_Diario-HPS2.csv",
+  "gvp_Diario-Planta_PE_II.csv",
+  "gvp_Diario-Tostado-Pasta-Frito.csv",
+  "gvp_Planta-Alergenos.csv",
+];
+
+async function loadFixedCSVs() {
+  if (state.loading) return;
+  state.loading = true; render();
+  // Construir base URL explícita desde window.location para evitar
+  // problemas con subcarpetas que tengan tildes en la URL
+  const base = window.location.href.replace(/\/[^/]*$/, '/');
+  try {
+    const sheetsInput = [];
+    for (const filename of FIXED_CSVS) {
+      try {
+        const url = base + filename + '?v=' + Date.now();
+        const resp = await fetch(url, {cache: 'no-store'});
+        if (!resp.ok) { console.warn('No se pudo cargar ' + filename + ' (' + resp.status + ') URL: ' + url); continue; }
+        const text = await resp.text();
+        const rows = parseCSV(text);
+        sheetsInput.push({ name: cleanSheetName(filename), rows });
+      } catch (e) { console.warn('Error cargando ' + filename + ': ' + e.message); }
+    }
+    const parsed = parseWorkbook(sheetsInput);
+    if (parsed.length === 0) {
+      showToast('No se pudieron cargar los CSV del repositorio', 'err');
+    } else {
+      state.sheets = parsed;
+      saveSheets();
+      showToast(parsed.length + ' hoja(s) cargada(s) automáticamente');
+    }
+  } catch (err) {
+    showToast('Error al cargar CSVs: ' + err.message, 'err');
+  }
+  state.loading = false; render();
+}
+
+function getFolderForSheet(sheetName) {
+  return FIXED_FOLDERS[sheetName] || FIXED_GENERAL_FOLDER;
+}
+
+function saveConfig() { localStorage.setItem('fv_config', JSON.stringify(state.config)); }
+function saveHistory() { localStorage.setItem('fv_history', JSON.stringify(state.history.slice(0,30))); }
+function saveInspector() { localStorage.setItem('fv_inspector', state.inspector); }
+
+// ── Toast ──
+let toastTimer;
+function showToast(msg, type='ok') {
+  state.toast = {msg, type};
+  // Don't call render() - just update the toast element directly
+  let toastEl = document.getElementById('app-toast');
+  if (!toastEl) {
+    toastEl = document.createElement('div');
+    toastEl.id = 'app-toast';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.className = 'toast toast-'+(type==='err'?'err':'ok');
+  toastEl.textContent = msg;
+  toastEl.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { 
+    toastEl.style.display = 'none';
+    state.toast = null; 
+  }, type==='err' ? 8000 : 3500);
+}
+
+// ── CSV Parser (RFC 4180, maneja comillas y comas dentro de campos) ──
+function parseCSV(text) {
+  // Quitar BOM si existe
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = [];
+  let row = [], field = '', i = 0, inQuotes = false;
+  while (i < text.length) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += c; i++; continue;
+    }
+    if (c === '"') { inQuotes = true; i++; continue; }
+    if (c === ',') { row.push(field); field = ''; i++; continue; }
+    if (c === '\r') { i++; continue; }
+    if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+    field += c; i++;
+  }
+  // Última fila si no termina en \n
+  if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// Limpia el nombre del archivo CSV para obtener el nombre de la hoja
+// Ej: "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-HPS1.csv" → "Diario-HPS1"
+function cleanSheetName(filename) {
+  let n = filename.replace(/\.csv$/i, '');
+  // Formato corto: gvp_NombreHoja → NombreHoja
+  if (n.startsWith('gvp_')) {
+    n = n.substring(4);
+    // Planta-Alergenos → Planta Alérgenos (mapeo especial)
+    if (n === 'Planta-Alergenos') return 'Planta Alérgenos';
+    return n.replace(/_/g, ' ').trim();
+  }
+  // Formato largo: ...._-_NombreHoja → NombreHoja
+  const idx = n.lastIndexOf('_-_');
+  if (idx >= 0) n = n.substring(idx + 3);
+  n = n.replace(/_/g, ' ').trim();
+  return n;
+}
+
+async function loadJsPDF() {
+  if (window.jspdf) return;
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  });
+}
+
+// ── Parse sheets (acepta [{name, rows}] donde rows es array de arrays) ──
+function parseWorkbook(sheetsInput) {
+  return sheetsInput.map(({name, rows}) => {
+    const raw = rows;
+    let headerIdx = -1;
+    for (let i = 0; i < Math.min(raw.length, 12); i++) {
+      const row = (raw[i]||[]).map(c => String(c||'').trim().toLowerCase());
+      if (row.includes('sector') && (row.includes('tipo') || row.includes('equipo/superficie'))) {
+        headerIdx = i; break;
+      }
+    }
+    if (headerIdx < 0) return { name, items: [], meta: {} };
+    let frequency='', riskLevel='';
+    for (let i = 0; i < headerIdx; i++) {
+      const row = (raw[i]||[]).map(c => String(c||'').trim());
+      const joined = row.join(' ').toLowerCase();
+      if (joined.includes('frecuencia de control')) {
+        const fi = row.findIndex(c => c.toLowerCase().includes('frecuencia de control'));
+        for (let j = fi+1; j < row.length; j++) {
+          if (row[j] && !row[j].toLowerCase().includes('frecuencia') && !row[j].toLowerCase().includes('fecha')) { frequency = row[j]; break; }
+        }
+      }
+      if (joined.includes('nivel de riesgo')) {
+        const ni = row.findIndex(c => c.toLowerCase().includes('nivel de riesgo'));
+        if (ni >= 0 && row[ni+1]) riskLevel = row[ni+1];
+      }
+    }
+    const headers = (raw[headerIdx]||[]).map(h => String(h||'').trim());
+    const colMap = {};
+    headers.forEach((h,i) => {
+      const lh = h.toLowerCase().replace(/\s+/g,'');
+      if (lh.includes('ubicaci')) colMap.ubicacion = i;
+      else if (lh==='n°'||lh==='nro'||lh==='n') colMap.num = i;
+      else if (lh.includes('sector')) colMap.sector = i;
+      else if (lh.includes('equipo')||lh.includes('superficie')) colMap.equipo = i;
+      else if (lh==='tipo') colMap.tipo = i;
+    });
+    const items = [];
+    let lastUb = '';
+    for (let i = headerIdx+1; i < raw.length; i++) {
+      const row = raw[i];
+      if (!row || row.every(c => c===null||c===undefined||String(c).trim()==='')) continue;
+      const ub = colMap.ubicacion !== undefined ? String(row[colMap.ubicacion]||'').trim() : '';
+      // Detectar filas de firma / pie de página. Sólo cortar si la fila no tiene
+      // número de ítem (col N° vacía) Y contiene una palabra clave clara de pie.
+      const _num = colMap.num !== undefined ? String(row[colMap.num]||'').trim() : '';
+      if (!_num) {
+        const cells = row.map(c => String(c||'').trim().toLowerCase());
+        const rowJoined = cells.join(' ');
+        const hasSigKeyword =
+          rowJoined.includes('jefe de pre-requisitos') ||
+          rowJoined.includes('supervisor de pre-requisitos') ||
+          rowJoined.includes('supervisor de sgcia') ||
+          rowJoined.includes('administrativo de sgcia') ||
+          rowJoined.includes('gerente de planta') ||
+          cells.some(c => c === 'realizó' || c === 'realizo' ||
+                          c === 'revisó' || c === 'reviso' ||
+                          c === 'aprobó' || c === 'aprobo');
+        if (hasSigKeyword) break;
+      }
+      if (ub) lastUb = ub;
+      const num = colMap.num !== undefined ? row[colMap.num] : '';
+      const sector = colMap.sector !== undefined ? String(row[colMap.sector]||'').trim() : '';
+      const equipo = colMap.equipo !== undefined ? String(row[colMap.equipo]||'').trim() : '';
+      const tipo = colMap.tipo !== undefined ? String(row[colMap.tipo]||'').trim() : '';
+      if (!sector && !equipo && !num) continue;
+      items.push({
+        id: Math.random().toString(36).slice(2,9),
+        ubicacion: lastUb, num: num ? String(Math.floor(Number(num))) : '',
+        sector, equipo, tipo, estado: '', observaciones: '',
+      });
+    }
+    return { name, items, meta: { frequency, riskLevel } };
+  }).filter(s => s.items.length > 0);
+}
+
+
+function loadEmbeddedData() {
+  // No hay datos embebidos: las hojas se cargan desde archivos CSV subidos por el usuario.
+  state.sheets = [];
+}
+
+// ── File upload (carga múltiples CSV, uno por hoja) ──
+function handleCSVs(e) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  state.loading = true; render();
+
+  const readFile = (file) => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = (ev) => {
+      try {
+        const text = ev.target.result;
+        const rows = parseCSV(text);
+        resolve({ name: cleanSheetName(file.name), rows });
+      } catch (err) { reject(err); }
+    };
+    r.onerror = () => reject(new Error('No se pudo leer ' + file.name));
+    r.readAsText(file, 'UTF-8');
+  });
+
+  Promise.all(files.map(readFile))
+    .then(sheetsInput => {
+      const parsed = parseWorkbook(sheetsInput);
+      if (parsed.length === 0) {
+        showToast('No se detectaron ítems en los CSV. Revisá el formato.', 'err');
+      } else {
+        // Si ya había hojas cargadas, hacemos merge reemplazando las de mismo nombre
+        const existing = state.sheets || [];
+        const map = new Map();
+        existing.forEach(s => map.set(s.name, s));
+        parsed.forEach(s => map.set(s.name, s));
+        state.sheets = Array.from(map.values());
+        saveSheets();
+        showToast(parsed.length + ' hoja(s) cargada(s) — total: ' + state.sheets.length);
+      }
+    })
+    .catch(err => showToast('Error: ' + err.message, 'err'))
+    .finally(() => { state.loading = false; render(); });
+
+  e.target.value = '';
+}
+
+// ── Limpiar hojas cargadas ──
+function clearSheets() {
+  if (!confirm('¿Borrar todas las hojas cargadas? Deberás cargar los CSV nuevamente.')) return;
+  state.sheets = [];
+  localStorage.removeItem('fv_sheets');
+  showToast('Hojas eliminadas');
+  render();
+}
+
+// ── Extract folder ID from URL or raw ID ──
+function extractFolderId(input) {
+  if (!input) return '';
+  const m = input.match(/folders\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : input.trim();
+}
+
+// ── Google Auth ──
+// ── Update Drive badge in header without full re-render ──
+function updateDriveBadge() {
+  const badge = document.getElementById('drive-badge');
+  if (!badge) { render(); return; } // fallback if badge not found
+  if (state.token) {
+    badge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;font-family:IBM Plex Mono,monospace;font-size:10px;color:#4A8556"><span style="width:6px;height:6px;border-radius:50%;background:#4A8556;display:inline-block"></span> Drive ✓</span>';
+  } else {
+    badge.innerHTML = '<button class="btn btn-s btn-accent" onclick="authenticate(false)" style="font-size:11px;padding:5px 10px">Conectar</button>';
+  }
+}
+
+function authenticate(silent) {
+  if (!state.config.clientId) { if(!silent) showToast('Ingresa Client ID en ⚙','err'); return; }
+  function doAuth() {
+    const savedHint = localStorage.getItem('fv_login_hint') || '';
+    const clientCfg = {
+      client_id: state.config.clientId, scope: SCOPES,
+      prompt: silent ? '' : 'select_account',
+      callback: (r) => {
+        if (r.access_token) {
+          state.token = r.access_token;
+          localStorage.setItem('fv_token', r.access_token);
+          localStorage.setItem('fv_token_time', Date.now().toString());
+          if (r.hint) localStorage.setItem('fv_login_hint', r.hint);
+          if (!silent) showToast('✓ Conectado a Drive');
+          // Actualizar solo el badge del header sin destruir el formulario
+          updateDriveBadge();
+        } else {
+          if (!silent) showToast('Error al conectar — intentá de nuevo', 'err');
+        }
+      },
+    };
+    // Use login_hint if we know the account — skips account picker on silent re-auth
+    if (savedHint) clientCfg.login_hint = savedHint;
+    const client = google.accounts.oauth2.initTokenClient(clientCfg);
+    client.requestAccessToken();
+  }
+  if (!window.google?.accounts) {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = doAuth; document.head.appendChild(s);
+  } else doAuth();
+}
+
+// Auto-connect on startup
+async function autoConnect() {
+  // Garantizar que los defaults siempre estén cargados
+  if (!state.config.clientId) { state.config.clientId = DEFAULT_CLIENT_ID; saveConfig(); }
+  if (!state.config.folderId) { state.config.folderId = DEFAULT_FOLDER_ID; saveConfig(); }
+
+  const savedToken = localStorage.getItem('fv_token');
+  const savedTime  = localStorage.getItem('fv_token_time');
+  const age = savedTime ? (Date.now() - parseInt(savedTime)) / 1000 : 99999;
+
+  // 1. Intentar reutilizar token guardado si tiene menos de 50 min
+  if (savedToken && age < 3000) {
+    try {
+      const res = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
+        headers: { Authorization: 'Bearer ' + savedToken }
+      });
+      if (res.ok) {
+        state.token = savedToken;
+        updateDriveBadge();
+        return; // ✓ conectado sin interacción
+      }
+    } catch {}
+  }
+
+  // 2. Token vencido o ausente → intentar silent re-auth (sin popup)
+  //    Solo funciona si el navegador ya tiene sesión Google activa
+  function loadGSIandTrySilent() {
+    function trySilent() {
+      try {
+        const hint = localStorage.getItem('fv_login_hint') || '';
+        const cfg = {
+          client_id: DEFAULT_CLIENT_ID,
+          scope: SCOPES,
+          prompt: '',          // vacío = sin popup (el navegador resuelve solo)
+          callback: (r) => {
+            if (r.access_token) {
+              state.token = r.access_token;
+              localStorage.setItem('fv_token', r.access_token);
+              localStorage.setItem('fv_token_time', Date.now().toString());
+              if (r.hint) localStorage.setItem('fv_login_hint', r.hint);
+              updateDriveBadge();
+            }
+            // Si falla en silencio → el botón "Conectar" queda disponible
+          },
+        };
+        if (hint) cfg.login_hint = hint;
+        google.accounts.oauth2.initTokenClient(cfg).requestAccessToken();
+      } catch(e) { /* fallo silencioso — usuario puede conectar manual */ }
+    }
+    if (window.google?.accounts) { trySilent(); }
+    else {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = trySilent;
+      document.head.appendChild(s);
+    }
+  }
+  loadGSIandTrySilent();
+}
+
+// ── Upload to Drive ──
+async function uploadToDrive(blob, fileName, folderId) {
+  const meta = { name: fileName, mimeType: 'application/pdf' };
+  if (folderId) meta.parents = [folderId];
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'}));
+  form.append('file', blob, fileName);
+  console.log('uploadToDrive → token:', !!state.token, '| folder:', folderId, '| size:', blob.size);
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method:'POST', headers:{Authorization:'Bearer '+state.token}, body:form,
+  });
+  if (!res.ok) {
+    const errBody = await res.text().catch(()=>'');
+    console.error('Drive API error:', res.status, errBody);
+    const err = new Error('Drive error '+res.status);
+    err.status = res.status;
+    err.body = errBody;
+    throw err;
+  }
+  const data = await res.json();
+  console.log('Drive upload OK — file id:', data.id);
+  return data;
+}
+
+// Authenticate and return a promise that resolves with the token
+function authenticateWithPromise() {
+  return new Promise((resolve, reject) => {
+    if (!state.config.clientId) { reject(new Error('Sin Client ID')); return; }
+    function doAuth() {
+      const savedHint = localStorage.getItem('fv_login_hint') || '';
+      const clientCfg = {
+        client_id: state.config.clientId, scope: SCOPES,
+        prompt: 'select_account',
+        callback: (r) => {
+          if (r.access_token) {
+            state.token = r.access_token;
+            localStorage.setItem('fv_token', r.access_token);
+            localStorage.setItem('fv_token_time', Date.now().toString());
+            if (r.hint) localStorage.setItem('fv_login_hint', r.hint);
+            updateDriveBadge();
+            resolve(r.access_token);
+          } else {
+            reject(new Error('No se pudo obtener token'));
+          }
+        },
+      };
+      if (savedHint) clientCfg.login_hint = savedHint;
+      google.accounts.oauth2.initTokenClient(clientCfg).requestAccessToken();
+    }
+    if (!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = doAuth; s.onerror = () => reject(new Error('No se pudo cargar Google auth'));
+      document.head.appendChild(s);
+    } else doAuth();
+  });
+}
+
+async function uploadAttachment(file, folderId) {
+  const meta = { name: file.name, mimeType: file.type||'application/octet-stream' };
+  if (folderId) meta.parents = [folderId];
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'}));
+  form.append('file', file, file.name);
+  await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method:'POST', headers:{Authorization:'Bearer '+state.token}, body:form,
+  });
+}
+
+// ── PDF Generation ──
+async function generatePDF() {
+  await loadJsPDF();
+  const sheet = state.activeSheet;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4', orientation:'landscape'});
+  const PW=297, PH=210, M=12, CW=PW-2*M;
+  let y = M;
+
+  // Header
+  doc.setFillColor(27,25,21);
+  doc.rect(0,0,PW,30,'F');
+  // Logo
+  try { doc.addImage(LOGO_B64,'JPEG',M,3,24,24); } catch{}
+  doc.setTextColor(244,241,236);
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text('REGISTRO DE CONTROL DE VIDRIOS Y PLÁSTICOS', M+28, 13);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(180,175,163);
+  doc.text('R-SIG-GVP 01 | Rev. 7 | '+sheet.name+' | '+sheet.meta.frequency, M+28, 21);
+  doc.text('Riesgo: '+(sheet.meta.riskLevel||'-'), M+28, 26);
+  doc.setTextColor(200,195,180);
+  doc.text('Fecha: '+state.controlDate+'  Hora: '+(state.controlTime||''), PW-M, 13, {align:'right'});
+  doc.text('Responsable de control: '+(state.inspector||'-'), PW-M, 21, {align:'right'});
+  y = 36;
+
+  const cols = [
+    {l:'Ubicación',w:38},{l:'N°',w:11},{l:'Sector',w:40},{l:'Equipo/Superficie',w:56},
+    {l:'Tipo',w:20},{l:'Estado',w:28},{l:'Observaciones',w:CW-38-11-40-56-20-28}
+  ];
+
+  function drawTH(yy) {
+    doc.setFillColor(122,99,50);
+    doc.rect(M,yy,CW,7,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(6.5); doc.setFont('helvetica','bold');
+    let x = M+1.5;
+    for (const c of cols) { doc.text(c.l.toUpperCase(), x, yy+5); x += c.w; }
+    return yy+7;
+  }
+  y = drawTH(y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+  let lastUb = '', stripe = false;
+  for (const item of sheet.items) {
+    if (y > PH-18) { doc.addPage(); y=M; y=drawTH(y); lastUb=''; }
+    const rh = 6;
+    if (stripe) { doc.setFillColor(248,247,244); doc.rect(M,y,CW,rh,'F'); }
+    doc.setDrawColor(218,213,203); doc.setLineWidth(.15); doc.line(M,y+rh,M+CW,y+rh);
+    let x = M+1.5; doc.setTextColor(44,40,32);
+    const showUb = item.ubicacion!==lastUb?item.ubicacion:'';
+    if (showUb) { doc.setFont('helvetica','bold'); doc.setFontSize(6.5); }
+    doc.text(doc.splitTextToSize(showUb,cols[0].w-2).slice(0,1).join(''), x, y+4); 
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    lastUb = item.ubicacion; x+=cols[0].w;
+    doc.text(String(item.num), x, y+4); x+=cols[1].w;
+    doc.text(doc.splitTextToSize(item.sector,cols[2].w-2).slice(0,1).join(''), x, y+4); x+=cols[2].w;
+    doc.text(doc.splitTextToSize(item.equipo,cols[3].w-2).slice(0,1).join(''), x, y+4); x+=cols[3].w;
+    doc.text(item.tipo, x, y+4); x+=cols[4].w;
+    if (item.estado==='Conforme') { doc.setTextColor(74,133,86); doc.setFont('helvetica','bold'); }
+    else if (item.estado==='No Conforme') { doc.setTextColor(179,64,51); doc.setFont('helvetica','bold'); }
+    else doc.setTextColor(145,139,127);
+    doc.text(item.estado||'—', x, y+4);
+    doc.setTextColor(44,40,32); doc.setFont('helvetica','normal'); x+=cols[5].w;
+    doc.setFontSize(6); doc.text(doc.splitTextToSize(item.observaciones||'',cols[6].w-2).slice(0,1).join(''), x, y+4);
+    doc.setFontSize(6.5);
+    y += rh; stripe = !stripe;
+  }
+
+  // Summary
+  y += 6;
+  if (y > PH-25) { doc.addPage(); y=M; }
+  const conf = sheet.items.filter(i=>i.estado==='Conforme').length;
+  const nc = sheet.items.filter(i=>i.estado==='No Conforme').length;
+  const pend = sheet.items.filter(i=>!i.estado).length;
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(122,99,50);
+  doc.text('RESUMEN', M, y); y+=5;
+  doc.setFont('helvetica','normal'); doc.setTextColor(44,40,32); doc.setFontSize(7.5);
+  doc.text('Total: '+sheet.items.length+'  |  Conforme: '+conf+'  |  No Conforme: '+nc+'  |  Pendiente: '+pend, M, y);
+  y+=8;
+
+  // General observations
+  if (state.generalObs) {
+    if (y > PH-30) { doc.addPage(); y=M; }
+    doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(122,99,50);
+    doc.text('OBSERVACIONES GENERALES', M, y); y+=5;
+    doc.setFont('helvetica','normal'); doc.setTextColor(44,40,32); doc.setFontSize(8);
+    const obsLines = doc.splitTextToSize(state.generalObs, CW);
+    doc.text(obsLines, M, y);
+    y += obsLines.length * 4 + 6;
+  }
+
+  // Signature + Date/Time
+  y += 4;
+  if (y > PH-50) { doc.addPage(); y=M; }
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(122,99,50);
+  doc.text('RESPONSABLE DE CONTROL', M, y);
+
+  // Col positions
+  const col1X = M, col2X = M + 100;
+  const sigStartY = y + 4;
+
+  // — Inspector signature (left col) —
+  if (state.signatureData) {
+    try { doc.addImage(state.signatureData, 'PNG', col1X, sigStartY, 55, 22); } catch{}
+  } else {
+    doc.setDrawColor(180,175,163); doc.setLineWidth(.3);
+    doc.line(col1X, sigStartY+16, col1X+70, sigStartY+16);
+  }
+  doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(44,40,32);
+  doc.text(state.inspector || '________________', col1X, sigStartY+22);
+  doc.setFontSize(6.5); doc.setTextColor(145,139,127);
+  doc.text('Firma responsable de control', col1X, sigStartY+27);
+
+  // — Natacha fixed signature (right col) — rotated to be upright
+  try { doc.addImage(FIRMA_NATACHA_B64, 'PNG', col2X, sigStartY, 28, 44); } catch{}
+  doc.setFontSize(6.5); doc.setTextColor(145,139,127);
+  doc.text('Verificó', col2X, sigStartY+49);
+
+  y = sigStartY + 42;
+  doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(145,139,127);
+  doc.text('Fecha: '+state.controlDate+'    Hora: '+(state.controlTime||''), M, y);
+
+  // Images
+  if (state.attachedFiles.length > 0) {
+    doc.addPage('p'); let iy=14;
+    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(122,99,50);
+    doc.text('EVIDENCIA FOTOGRÁFICA', 20, iy); iy+=10;
+    for (const af of state.attachedFiles) {
+      if (af.dataUrl && (af.type||af.file?.type||'').startsWith('image/')) {
+        try {
+          if (iy > 230) { doc.addPage('p'); iy=14; }
+          doc.addImage(af.dataUrl, 'JPEG', 20, iy, 90, 60);
+          iy += 62;
+          doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(145,139,127);
+          doc.text(af.name, 20, iy); iy+=10;
+        } catch(imgErr) {
+          doc.setFontSize(7); doc.text('[Imagen: '+af.name+']', 20, iy); iy+=8;
+        }
+      } else {
+        if (iy > 270) { doc.addPage('p'); iy=14; }
+        doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(92,85,74);
+        doc.text('📎 '+af.name, 20, iy); iy+=8;
+      }
+    }
+  }
+
+  const pages = doc.internal.getNumberOfPages();
+  for (let i=1;i<=pages;i++) {
+    doc.setPage(i);
+    const pw=doc.internal.pageSize.getWidth(), ph=doc.internal.pageSize.getHeight();
+    doc.setFontSize(6.5); doc.setFont('helvetica','normal'); doc.setTextColor(180,175,163);
+    doc.text('R-SIG-GVP 01 — '+sheet.name+' — Pág. '+i+'/'+pages, pw/2, ph-5, {align:'center'});
+  }
+  return doc.output('blob');
+}
+
+// ── Save & Upload ──
+// Keeps the last generated PDF so it's never lost
+let _pendingBlob = null;
+let _pendingFileName = '';
+
+async function handleSave() {
+  if (!state.activeSheet) return;
+  const pend = state.activeSheet.items.filter(i=>!i.estado).length;
+  if (pend > 0 && !confirm('Hay '+pend+' ítems sin completar. ¿Guardar igual?')) return;
+
+  const saveEl = document.getElementById('save-btn');
+  function setBtn(text) { if (saveEl) { saveEl.disabled = true; saveEl.innerHTML = '<span class="spinner"></span> '+text; } }
+  function resetBtn() { if (saveEl) { saveEl.disabled = false; saveEl.innerHTML = '💾 GUARDAR'; } }
+
+  // ── STEP 1: Ensure we have a token ──
+  if (!state.token) {
+    setBtn('Conectando...');
+    try {
+      await authenticateWithPromise();
+    } catch(authErr) {
+      resetBtn();
+      showToast('⚠ Necesitás conectar Google Drive para guardar. Tocá "Conectar" arriba.', 'err');
+      return;
+    }
+  }
+
+  setBtn('Generando PDF...');
+  state.uploading = true;
+
+  try {
+    // ── STEP 2: Generate PDF ──
+    const ts = new Date();
+    const d = state.controlDate;
+    const t = (state.controlTime||ts.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})).replace(':','');
+    _pendingFileName = 'R-SIG-GVP_01_'+state.activeSheet.name+'_'+d+'_'+t+'.pdf';
+    _pendingBlob = await generatePDF();
+
+    // ── STEP 3: Upload to Drive (with auto-retry on 401) ──
+    setBtn('Subiendo a Drive...');
+    const folderId = getFolderForSheet(state.activeSheet.name);
+    let uploaded = false;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await uploadToDrive(_pendingBlob, _pendingFileName, folderId);
+        uploaded = true;
+        break;
+      } catch(upErr) {
+        lastError = upErr;
+        console.error('Upload attempt '+attempt+' failed:', upErr);
+        if (upErr.status === 401 && attempt === 1) {
+          // Token expired → re-authenticate and retry
+          setBtn('Reconectando...');
+          state.token = null;
+          localStorage.removeItem('fv_token');
+          try {
+            await authenticateWithPromise();
+            setBtn('Reintentando...');
+          } catch(reAuthErr) {
+            break; // Can't re-auth, will show error below
+          }
+        } else {
+          break; // Non-401 error or second attempt failed
+        }
+      }
+    }
+
+    if (!uploaded) {
+      resetBtn();
+      state.uploading = false;
+      const errMsg = lastError?.status === 403
+        ? 'Error 403: La API de Google Drive no está habilitada o no tenés permiso. Habilitala en console.cloud.google.com → APIs → Google Drive API.'
+        : lastError?.status === 401
+        ? 'No se pudo autenticar. Tocá "Conectar" y autorizá de nuevo.'
+        : 'Error al subir: ' + (lastError?.message || 'desconocido') + '. Tocá GUARDAR para reintentar.';
+      showToast(errMsg, 'err');
+      // PDF queda en _pendingBlob - el usuario puede reintentar sin perder datos
+      return;
+    }
+
+    // ── STEP 4: Upload non-image attachments ──
+    for (const af of state.attachedFiles) {
+      if (af.file && !(af.type||af.file.type||'').startsWith('image/')) {
+        try { await uploadAttachment(af.file, folderId); } catch(e) { console.warn('Adjunto falló:', e); }
+      }
+    }
+
+    // ── STEP 5: Success ──
+    showToast('✓ PDF guardado en Drive correctamente');
+    _pendingBlob = null;
+    _pendingFileName = '';
+
+    state.history.unshift({
+      sheet:state.activeSheet.name, date:ts.toISOString(), fileName: _pendingFileName || 'ok',
+      total:state.activeSheet.items.length,
+      ok:state.activeSheet.items.filter(i=>i.estado==='Conforme').length,
+      nc:state.activeSheet.items.filter(i=>i.estado==='No Conforme').length,
+    });
+    saveHistory();
+    state.attachedFiles = [];
+    state.signatureData = null;
+    state.generalObs = '';
+
+  } catch(err) {
+    console.error('Save error:', err);
+    showToast('Error inesperado: '+err.message+'. El PDF está guardado, tocá GUARDAR para reintentar.', 'err');
+  }
+  state.uploading = false;
+  resetBtn();
+  render();
+}
+
+// Retry pending upload (if user had a failure and clicks save again)
+// The PDF is still in _pendingBlob so no need to regenerate
+
+async function handlePreview() {
+  if (!state.activeSheet) return;
+  try {
+    const blob = await generatePDF();
+    const url = URL.createObjectURL(blob);
+    // On mobile, open in new tab works better than download
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+      window.open(url, '_blank');
+    } else {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'preview_'+state.activeSheet.name+'.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch(err) { showToast('Error: '+err.message,'err'); }
+}
+
+// ── Set all statuses ──
+function setAllStatus(status) {
+  if (!state.activeSheet) return;
+  state.activeSheet.items.forEach(i => i.estado = status);
+  render();
+}
+
+// ── Attachments ──
+function handleAttach(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(f => {
+    const entry = {
+      id: Math.random().toString(36).slice(2,9), file:f, name:f.name, type:f.type, size:f.size,
+      preview: null, dataUrl: null,
+    };
+    // Convert to base64 immediately (mobile files can become stale)
+    const reader = new FileReader();
+    reader.onload = () => {
+      entry.dataUrl = reader.result;
+      if (f.type.startsWith('image/')) entry.preview = reader.result;
+      render();
+    };
+    reader.readAsDataURL(f);
+    state.attachedFiles.push(entry);
+  });
+  render(); e.target.value = '';
+}
+function removeAttach(id) {
+  state.attachedFiles = state.attachedFiles.filter(f=>f.id!==id);
+  render();
+}
+
+// ── GAS Code ──
+function gasCode() {
+  return `// FormVault GVP — Recordatorio
+const FOLDER_ID = "${FIXED_GENERAL_FOLDER}";
+const RESPONSIBLE_EMAIL = "nfernandez@maniagro.com";
+const DEADLINE_HOUR = 9;
+const DEADLINE_MINUTE = 0;
+
+function checkSubmissions() {
+  const now = new Date();
+  if (now.getHours() < DEADLINE_HOUR || (now.getHours()===DEADLINE_HOUR && now.getMinutes()<DEADLINE_MINUTE)) return;
+  const folder = DriveApp.getFolderById(FOLDER_ID);
+  const today = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  const files = folder.getFilesByType("application/pdf");
+  let found = false;
+  while (files.hasNext()) {
+    if (Utilities.formatDate(files.next().getDateCreated(), Session.getScriptTimeZone(), "yyyy-MM-dd") === today) { found = true; break; }
+  }
+  if (!found) {
+    MailApp.sendEmail({
+      to: RESPONSIBLE_EMAIL,
+      subject: "⚠️ R-SIG-GVP 01: Registro pendiente — " + today,
+      body: "No se cargó el registro de Control de Vidrios y Plásticos para hoy ("+today+").\\nHora límite: "+DEADLINE_HOUR+":"+String(DEADLINE_MINUTE).padStart(2,'0')+"\\n\\n— FormVault"
+    });
+  }
+}
+function testReminder() {
+  MailApp.sendEmail({to:RESPONSIBLE_EMAIL, subject:"🧪 Test FormVault", body:"Email de prueba del sistema de recordatorio."});
+}`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function h(tag, props, ...children) {
+  const el = document.createElement(tag);
+  if (props) Object.entries(props).forEach(([k,v]) => {
+    if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'className') el.className = v;
+    else if (k === 'innerHTML') el.innerHTML = v;
+    else if (k === 'disabled' || k === 'checked' || k === 'selected' || k === 'required' || k === 'multiple') {
+      // Boolean HTML attributes: set as property, not attribute
+      el[k] = !!v;
+    }
+    else if (v === false || v === null || v === undefined) { /* skip falsy attributes */ }
+    else el.setAttribute(k, v);
+  });
+  children.flat(Infinity).forEach(c => {
+    if (c == null || c === false) return;
+    el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return el;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  // Toast
+  if (state.toast) {
+    app.appendChild(h('div', {className:'toast toast-'+(state.toast.type==='err'?'err':'ok')}, state.toast.msg));
+  }
+
+  // Header
+  const header = h('div', {className:'header'},
+    h('div', {className:'header-logo', onClick:()=>{state.view='home';state.activeSheet=null;render();}},
+      h('img', {src:LOGO_B64, style:{width:'36px',height:'36px',borderRadius:'6px',objectFit:'cover'}}),
+      h('div', null,
+        h('span', {className:'name'}, 'Maniagro'),
+        h('span', {className:'badge', style:{marginLeft:'6px'}}, 'GVP'),
+      ),
+    ),
+    h('div', {className:'header-actions'},
+      h('span', {id:'drive-badge'},
+        state.token
+          ? h('span', {className:'drive-badge', style:{color:'#4A8556'}}, h('span',{className:'drive-dot',style:{background:'#4A8556'}}), ' Drive ✓')
+          : h('button', {className:'btn btn-s btn-accent', onClick:()=>authenticate(false)}, 'Conectar')
+      ),
+      h('button', {className:'btn btn-s btn-ghost', style:{color:'rgba(255,255,255,.5)',fontSize:'18px'}, onClick:()=>{state.view='config';render();}}, '⚙'),
+    ),
+  );
+  app.appendChild(header);
+
+  const content = h('div', {className:'content'});
+
+  // ══ HOME ══
+  if (state.view === 'home') {
+    content.className = 'content fade-up';
+    content.appendChild(h('h1', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'30px',marginBottom:'4px',lineHeight:'1.15'}}, 'Control de Vidrios y Plásticos'));
+    content.appendChild(h('p', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'20px'}}, 'R-SIG-GVP 01'));
+
+    if (state.sheets.length === 0) {
+      const empty = h('div', {className:'card', style:{textAlign:'center',padding:'40px 20px'}});
+      empty.appendChild(h('div', {style:{fontSize:'44px',marginBottom:'8px'}}, state.loading ? '⏳' : '📋'));
+      empty.appendChild(h('div', {style:{fontSize:'16px',fontWeight:'600',marginBottom:'4px'}},
+        state.loading ? 'Cargando formularios...' : 'No se encontraron formularios'));
+      empty.appendChild(h('div', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'20px',lineHeight:'1.5'}},
+        state.loading
+          ? 'Trayendo los CSV desde el repositorio.'
+          : 'Verificá la conexión a internet e intentá recargar.'));
+      if (!state.loading) {
+        const btn = h('button', {className:'btn btn-accent', onClick:loadFixedCSVs}, '↻ Reintentar');
+        empty.appendChild(btn);
+      }
+      content.appendChild(empty);
+    } else {
+      // Sheets grid
+      const reloadRow = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px',gap:'8px'}});
+      reloadRow.appendChild(h('span', {className:'mono', style:{fontSize:'11px',color:'var(--text-d)'}}, state.sheets.length+' hojas'));
+      const btnGroup = h('div', {style:{display:'flex',gap:'6px'}});
+      btnGroup.appendChild(h('button', {className:'btn btn-s btn-ghost', onClick:loadFixedCSVs, disabled:state.loading}, state.loading ? '⏳ Actualizando...' : '↻ Actualizar'));
+      reloadRow.appendChild(btnGroup);
+      content.appendChild(reloadRow);
+
+      const grid = h('div', {className:'sheets-grid'});
+      state.sheets.forEach((s, i) => {
+        const freq = (s.meta.frequency || '').toLowerCase();
+        const isDiario = freq.includes('diario') || freq.includes('diaria');
+        const isMensual = freq.includes('mensual');
+        const isBimestral = freq.includes('bimestral');
+        const isTrimestral = freq.includes('trimestral');
+        const isSemestral = freq.includes('semestral');
+
+        let freqClass = '';
+        let dotColor = '#B34033';
+        if (isBimestral) { freqClass = 'freq-bimestral'; dotColor = '#7B4F9B'; }
+        else if (isTrimestral) { freqClass = 'freq-trimestral'; dotColor = '#2E6FB8'; }
+        else if (isSemestral) { freqClass = 'freq-semestral'; dotColor = '#4A8556'; }
+        else if (isMensual) { freqClass = 'freq-mensual'; dotColor = '#B34033'; }
+        else if (isDiario) { freqClass = 'freq-diario'; dotColor = '#B34033'; }
+        else { freqClass = 'freq-diario'; dotColor = '#B34033'; }
+
+        const card = h('div', {className:'sheet-card '+freqClass, style:{animationDelay:i*.04+'s'}, onClick:()=>{
+          state.activeSheet = s; state.view='fill'; state.attachedFiles=[]; state.controlDate=new Date().toISOString().slice(0,10); state.controlTime=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); state.generalObs=''; state.signatureData=null; render();
+        }},
+          h('div', {className:'freq'}, h('span',{className:'dot',style:{background:dotColor}}), s.meta.frequency||'—'),
+          h('div', {className:'sname'}, displayName(s.name)),
+          h('div', {className:'sitems'}, s.items.length+' ítems'),
+        );
+        grid.appendChild(card);
+      });
+      content.appendChild(grid);
+
+      // History
+      if (state.history.length > 0) {
+        content.appendChild(h('h3', {style:{fontSize:'11px',fontWeight:'600',color:'var(--text-mu)',textTransform:'uppercase',letterSpacing:'.06em',marginTop:'28px',marginBottom:'10px'}}, 'Últimos envíos'));
+        state.history.slice(0,6).forEach(hi => {
+          content.appendChild(h('div', {className:'history-item'},
+            h('div', {style:{display:'flex',alignItems:'center',gap:'8px'}},
+              h('span', {style:{color:'var(--ok)'}}, '✓'),
+              h('span', {style:{fontWeight:'600'}}, displayName(hi.sheet)),
+              h('span', {className:'mono', style:{fontSize:'10px',color:'var(--text-d)'}}, hi.ok+'/'+hi.total),
+            ),
+            h('span', {className:'mono', style:{fontSize:'10px',color:'var(--text-d)'}},
+              new Date(hi.date).toLocaleDateString('es-AR',{day:'2-digit',month:'short'})),
+          ));
+        });
+      }
+    }
+  }
+
+  // ══ FILL ══
+  else if (state.view === 'fill' && state.activeSheet) {
+    const sheet = state.activeSheet;
+    content.className = 'content fade-up';
+    content.style.padding = '0';
+    content.style.paddingBottom = '0';
+
+    // Top section
+    const top = h('div', {style:{padding:'16px'}});
+    top.appendChild(h('button', {className:'btn btn-s btn-ghost', style:{marginBottom:'8px'}, onClick:()=>{state.view='home';state.activeSheet=null;render();}}, '← Volver'));
+    top.appendChild(h('h1', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'20px',marginBottom:'2px'}}, displayName(sheet.name)));
+    top.appendChild(h('div', {className:'mono', style:{fontSize:'10px',color:'var(--text-d)',marginBottom:'12px'}}, (sheet.meta.frequency||'—')+' • Riesgo '+(sheet.meta.riskLevel||'—')+' • '+sheet.items.length+' ítems'));
+
+    // Folder indicator
+    const sheetFolder = getFolderForSheet(sheet.name);
+    if (sheetFolder) {
+      top.appendChild(h('div', {style:{fontSize:'11px',color:'var(--ok)',marginBottom:'10px',display:'flex',alignItems:'center',gap:'5px'}},
+        h('span', null, '📂'),
+        h('span', null, 'Carpeta asignada'),
+        h('span', {className:'mono', style:{fontSize:'9px',color:'var(--text-d)'}}, '('+sheetFolder.slice(0,12)+'...)')
+      ));
+    } else {
+      top.appendChild(h('div', {style:{fontSize:'11px',color:'var(--nc)',marginBottom:'10px'}}, '⚠ Sin carpeta asignada — se usará la carpeta por defecto ('+DEFAULT_FOLDER_ID.slice(0,8)+'...)'));
+    }
+
+    // Responsable/Date/Time
+    const metaRow = h('div', {style:{display:'flex',gap:'10px',marginBottom:'12px',flexWrap:'wrap'}});
+    const inspDiv = h('div', {style:{flex:'2 1 150px'}});
+    inspDiv.appendChild(h('label', {className:'config-label'}, 'Responsable de control'));
+    const inspInput = h('input', {placeholder:'Nombre completo', value:state.inspector, style:{fontSize:'14px',padding:'10px 12px'}});
+    inspInput.addEventListener('input', e => { state.inspector = e.target.value; saveInspector(); });
+    inspDiv.appendChild(inspInput);
+    metaRow.appendChild(inspDiv);
+
+    const dateDiv = h('div', {style:{flex:'1 1 100px'}});
+    dateDiv.appendChild(h('label', {className:'config-label'}, 'Fecha'));
+    const dateInput = h('input', {type:'date', value:state.controlDate, style:{fontSize:'14px',padding:'10px 12px'}});
+    dateInput.addEventListener('input', e => { state.controlDate = e.target.value; });
+    dateDiv.appendChild(dateInput);
+    metaRow.appendChild(dateDiv);
+
+    const timeDiv = h('div', {style:{flex:'1 1 80px'}});
+    timeDiv.appendChild(h('label', {className:'config-label'}, 'Hora'));
+    const timeInput = h('input', {type:'time', value:state.controlTime, style:{fontSize:'14px',padding:'10px 12px'}});
+    timeInput.addEventListener('input', e => { state.controlTime = e.target.value; });
+    timeDiv.appendChild(timeInput);
+    metaRow.appendChild(timeDiv);
+    top.appendChild(metaRow);
+
+    // Progress
+    const completed = sheet.items.filter(i=>i.estado).length;
+    const pct = sheet.items.length > 0 ? (completed/sheet.items.length)*100 : 0;
+    const progRow = h('div', {style:{display:'flex',justifyContent:'space-between',marginBottom:'4px'}});
+    progRow.appendChild(h('span', {className:'mono', style:{fontSize:'11px',color:'var(--text-m)'}}, completed+'/'+sheet.items.length));
+    progRow.appendChild(h('span', {className:'mono', style:{fontSize:'11px',color:'var(--accent)'}}, Math.round(pct)+'%'));
+    top.appendChild(progRow);
+    const progBar = h('div', {className:'progress-bar'}, h('div',{className:'progress-fill',style:{width:pct+'%'}}));
+    top.appendChild(progBar);
+
+    // Quick actions
+    const qa = h('div', {style:{display:'flex',gap:'6px',marginTop:'12px',flexWrap:'wrap'}});
+    qa.appendChild(h('button', {className:'btn btn-s btn-ok', onClick:()=>{setAllStatus('Conforme');}}, '✓ Todo Conforme'));
+    qa.appendChild(h('button', {className:'btn btn-s btn-default', onClick:()=>{setAllStatus('N/A');}}, 'Todo N/A'));
+    qa.appendChild(h('button', {className:'btn btn-s btn-ghost', onClick:()=>{setAllStatus('');}}, 'Limpiar'));
+    top.appendChild(qa);
+    content.appendChild(top);
+
+    // Group by ubicacion
+    const groups = {};
+    sheet.items.forEach(item => {
+      const k = item.ubicacion || 'General';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(item);
+    });
+
+    Object.entries(groups).forEach(([ub, items]) => {
+      const groupOk = items.filter(i=>i.estado).length;
+      content.appendChild(h('div', {className:'section-header'},
+        h('span', null, ub),
+        h('span', {className:'count'}, groupOk+'/'+items.length),
+      ));
+
+      items.forEach((item, idx) => {
+        const row = h('div', {className:'inspect-row'});
+        const rowTop = h('div', {className:'row-top'});
+        const info = h('div', {className:'row-info'});
+        info.appendChild(h('div', null,
+          h('span', {className:'row-num'}, '#'+item.num),
+          h('span', {className:'row-equipo'}, item.equipo),
+        ));
+        info.appendChild(h('div', {className:'row-sector'}, item.sector));
+        info.appendChild(h('span', {className:'row-tipo'}, item.tipo));
+        rowTop.appendChild(info);
+
+        // Status pills
+        const sg = h('div', {className:'status-group'});
+        STATUS_OPT.forEach(st => {
+          const cls = item.estado===st ? (st==='Conforme'?'active-ok':st==='No Conforme'?'active-nc':'active-na') : '';
+          const label = st==='Conforme'?'✓':st==='No Conforme'?'✗':'—';
+          sg.appendChild(h('button', {
+            className:'status-pill '+cls,
+            onClick:()=>{ item.estado = item.estado===st?'':st; render(); }
+          }, label));
+        });
+        rowTop.appendChild(sg);
+        row.appendChild(rowTop);
+
+        // Obs input (only show if NC or always?)
+        const obsInput = h('input', {
+          className:'obs-input', placeholder:'Observaciones...', value:item.observaciones,
+          style:{fontSize:'13px'},
+        });
+        obsInput.addEventListener('input', e => { item.observaciones = e.target.value; });
+        row.appendChild(obsInput);
+        content.appendChild(row);
+      });
+    });
+
+    // General observations section
+    const obsSection = h('div', {style:{padding:'16px',borderTop:'1.5px solid var(--border)'}});
+    obsSection.appendChild(h('label', {style:{display:'block',fontSize:'12px',fontWeight:'600',color:'var(--text-m)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'8px'}}, '📝 Observaciones generales'));
+    const genObs = h('textarea', {placeholder:'Escribí observaciones generales sobre la inspección...', value:state.generalObs, style:{fontSize:'14px',padding:'12px',minHeight:'80px',borderRadius:'8px',border:'1.5px solid var(--border)',width:'100%',fontFamily:"'DM Sans',sans-serif",resize:'vertical'}});
+    genObs.addEventListener('input', e => { state.generalObs = e.target.value; });
+    obsSection.appendChild(genObs);
+    content.appendChild(obsSection);
+
+    // Attachments section
+    const attachSection = h('div', {style:{padding:'16px',borderTop:'1.5px solid var(--border)'}});
+    const attachHeader = h('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}});
+    attachHeader.appendChild(h('span', {style:{fontSize:'12px',fontWeight:'600',color:'var(--text-m)',textTransform:'uppercase',letterSpacing:'.04em'}},
+      '📎 Evidencia' + (state.attachedFiles.length > 0 ? ' ('+state.attachedFiles.length+')' : '')));
+    const afi = h('input', {type:'file', multiple:'true', accept:'image/*,.pdf,.doc,.docx,.xls,.xlsx', style:{display:'none'}, onChange:handleAttach});
+    attachHeader.appendChild(afi);
+    // Camera button + file button
+    const cameraInput = h('input', {type:'file', accept:'image/*', capture:'environment', style:{display:'none'}, onChange:handleAttach});
+    const attachBtns = h('div', {style:{display:'flex',gap:'4px'}});
+    attachBtns.appendChild(h('button', {className:'btn btn-s btn-default', onClick:()=>cameraInput.click()}, '📸'));
+    attachBtns.appendChild(h('button', {className:'btn btn-s btn-default', onClick:()=>afi.click()}, '📁 Adjuntar'));
+    attachHeader.appendChild(cameraInput);
+    attachHeader.appendChild(attachBtns);
+    attachSection.appendChild(attachHeader);
+
+    if (state.attachedFiles.length === 0) {
+      const dropZone = h('div', {
+        style:{border:'2px dashed var(--border)',borderRadius:'10px',padding:'20px',textAlign:'center',cursor:'pointer'},
+        onClick:()=>afi.click(),
+      });
+      dropZone.appendChild(h('div', {style:{fontSize:'28px',marginBottom:'4px'}}, '📷'));
+      dropZone.appendChild(h('div', {style:{color:'var(--text-mu)',fontSize:'12px'}}, 'Tocar para adjuntar fotos o archivos'));
+      attachSection.appendChild(dropZone);
+    } else {
+      const agrid = h('div', {className:'attach-grid'});
+      state.attachedFiles.forEach(af => {
+        const item = h('div', {className:'attach-item'});
+        if (af.preview) item.appendChild(h('img', {src:af.preview}));
+        else item.appendChild(h('div', {className:'attach-placeholder'}, '📄'));
+        item.appendChild(h('div', {className:'attach-name'}, af.name));
+        item.appendChild(h('button', {className:'attach-remove', onClick:()=>removeAttach(af.id)}, '✕'));
+        agrid.appendChild(item);
+      });
+      // Add more button inside grid
+      const addMore = h('div', {className:'attach-item', style:{cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'90px',border:'2px dashed var(--border)',background:'transparent'}, onClick:()=>afi.click()});
+      addMore.appendChild(h('div', {style:{fontSize:'24px',color:'var(--text-d)'}}, '+'));
+      addMore.appendChild(h('div', {style:{fontSize:'9px',color:'var(--text-d)'}}, 'Agregar más'));
+      agrid.appendChild(addMore);
+      attachSection.appendChild(agrid);
+    }
+    content.appendChild(attachSection);
+
+    // Signature section
+    const sigSection = h('div', {style:{padding:'16px',borderTop:'1.5px solid var(--border)'}});
+    sigSection.appendChild(h('label', {style:{display:'block',fontSize:'12px',fontWeight:'600',color:'var(--text-m)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'8px'}}, '✍ Firma — Responsable de control'));
+    const sigCanvas = h('canvas', {width:'640', height:'240', style:{border:'1.5px solid var(--border)',borderRadius:'10px',background:'var(--surface)',width:'100%',maxWidth:'400px',height:'120px',touchAction:'none',cursor:'crosshair'}});
+    let isDrawing = false;
+    function getPos(e) {
+      const r = sigCanvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return { x: (touch.clientX - r.left) * (sigCanvas.width / r.width), y: (touch.clientY - r.top) * (sigCanvas.height / r.height) };
+    }
+    function startDraw(e) { e.preventDefault(); isDrawing = true; const ctx = sigCanvas.getContext('2d'); ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }
+    function draw(e) { if (!isDrawing) return; e.preventDefault(); const ctx = sigCanvas.getContext('2d'); ctx.strokeStyle = '#2C2820'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function endDraw() { if (isDrawing) { isDrawing = false; state.signatureData = sigCanvas.toDataURL('image/png'); } }
+    sigCanvas.addEventListener('mousedown', startDraw); sigCanvas.addEventListener('mousemove', draw); sigCanvas.addEventListener('mouseup', endDraw); sigCanvas.addEventListener('mouseleave', endDraw);
+    sigCanvas.addEventListener('touchstart', startDraw, {passive:false}); sigCanvas.addEventListener('touchmove', draw, {passive:false}); sigCanvas.addEventListener('touchend', endDraw);
+    sigSection.appendChild(sigCanvas);
+    // Restore previous signature after canvas is in DOM
+    if (state.signatureData) {
+      setTimeout(() => {
+        try {
+          const img = new Image();
+          img.onload = () => { sigCanvas.getContext('2d').drawImage(img, 0, 0); };
+          img.src = state.signatureData;
+        } catch(e) {}
+      }, 50);
+    }
+    const clearSig = h('button', {className:'btn btn-s btn-ghost', style:{marginTop:'6px'}, onClick:()=>{ const ctx=sigCanvas.getContext('2d'); ctx.clearRect(0,0,sigCanvas.width,sigCanvas.height); state.signatureData=null; }}, '✕ Borrar firma');
+    sigSection.appendChild(clearSig);
+    content.appendChild(sigSection);
+
+    // Bottom bar
+    const bottomBar = h('div', {className:'bottom-bar'});
+    const saveBtn = h('button', {
+      id:'save-btn',
+      className:'btn btn-accent', style:{flex:'1'},
+      disabled: state.uploading,
+      onClick: handleSave,
+    }, state.uploading ? h('span',{className:'spinner'}) : '💾', state.uploading ? ' Guardando...' : ' GUARDAR');
+    bottomBar.appendChild(saveBtn);
+    bottomBar.appendChild(h('button', {className:'btn btn-default', onClick:handlePreview}, '👁 Preview'));
+    content.appendChild(bottomBar);
+  }
+
+  // ══ CONFIG ══
+  else if (state.view === 'config') {
+    content.className = 'content fade-up';
+    content.appendChild(h('button', {className:'btn btn-s btn-ghost', style:{marginBottom:'8px'}, onClick:()=>{state.view='home';render();}}, '← Volver'));
+    content.appendChild(h('h1', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'22px',marginBottom:'4px'}}, 'Configuración'));
+    content.appendChild(h('p', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'20px'}}, 'Google Drive y avisos por email'));
+
+    // Drive section (lectura — credenciales y carpetas están hardcodeadas)
+    const driveCard = h('div', {className:'card config-section'});
+    driveCard.appendChild(h('div', {className:'config-title'}, '🔑 Google Drive'));
+    driveCard.appendChild(h('p', {style:{fontSize:'12px',color:'var(--text-mu)',marginBottom:'12px',lineHeight:'1.5'}},
+      'Las credenciales y carpetas de destino están preconfiguradas por el administrador. No se pueden modificar desde este dispositivo.'));
+
+    driveCard.appendChild(h('button', {className:'btn btn-s '+(state.token?'btn-ok':'btn-accent'), onClick:authenticate},
+      state.token ? '✓ Reconectar' : 'Conectar con Google'));
+    content.appendChild(driveCard);
+
+    // Carpetas preasignadas (solo lectura)
+    if (state.sheets.length > 0) {
+      const folderCard = h('div', {className:'card config-section'});
+      folderCard.appendChild(h('div', {className:'config-title'}, '📂 Carpetas de destino'));
+      folderCard.appendChild(h('p', {style:{fontSize:'12px',color:'var(--text-mu)',marginBottom:'14px',lineHeight:'1.5'}},
+        'Cada formulario sube a una carpeta fija. Para cambiar una carpeta, contactá al administrador.'));
+
+      state.sheets.forEach(s => {
+        const row = h('div', {style:{marginBottom:'10px',padding:'10px 12px',background:'rgba(255,255,255,.03)',border:'1px solid var(--b)',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px'}});
+        row.appendChild(h('span', {style:{fontSize:'13px',fontWeight:'500'}}, '📋 '+displayName(s.name)));
+        row.appendChild(h('span', {style:{fontSize:'11px',color:'var(--ok)',whiteSpace:'nowrap'}}, '✓ Asignada'));
+        folderCard.appendChild(row);
+      });
+      content.appendChild(folderCard);
+    }
+
+    // Email section
+    const emailCard = h('div', {className:'card config-section'});
+    emailCard.appendChild(h('div', {className:'config-title'}, '📧 Aviso por email'));
+
+    const emRow = h('div', {style:{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'12px'}});
+    const emDiv = h('div', {style:{flex:'2 1 180px'}});
+    emDiv.appendChild(h('label', {className:'config-label'}, 'Email responsable'));
+    emDiv.appendChild(h('input', {type:'email', value:'nfernandez@maniagro.com', disabled:true, style:{opacity:'0.7',cursor:'not-allowed'}}));
+    emRow.appendChild(emDiv);
+
+    const dlDiv = h('div', {style:{flex:'1 1 100px'}});
+    dlDiv.appendChild(h('label', {className:'config-label'}, 'Hora límite'));
+    dlDiv.appendChild(h('input', {type:'time', value:'09:00', disabled:true, style:{opacity:'0.7',cursor:'not-allowed'}}));
+    emRow.appendChild(dlDiv);
+    emailCard.appendChild(emRow);
+
+    emailCard.appendChild(h('button', {className:'btn btn-s btn-default', onClick:()=>{state.view='script';render();}}, '📜 Ver script de recordatorio'));
+    content.appendChild(emailCard);
+
+    // Sync section
+    const syncCard = h('div', {className:'card config-section'});
+    syncCard.appendChild(h('div', {className:'config-title'}, '🔄 Sincronizar configuración'));
+    syncCard.appendChild(h('p', {style:{fontSize:'12px',color:'var(--text-mu)',marginBottom:'14px',lineHeight:'1.5'}}, 'Transferí tu configuración a otro dispositivo (celular, otra PC, etc.) sin perder los datos cargados.'));
+
+    const syncBtns = h('div', {style:{display:'flex',flexDirection:'column',gap:'8px'}});
+    syncBtns.appendChild(h('button', {className:'btn btn-accent btn-full', onClick:shareConfigURL}, '📲 Generar enlace para otro dispositivo'));
+    syncBtns.appendChild(h('button', {className:'btn btn-default btn-full', onClick:exportConfigToFile}, '📥 Exportar config (archivo JSON)'));
+    syncBtns.appendChild(h('button', {className:'btn btn-default btn-full', onClick:importConfigFromFile}, '📤 Importar config (archivo JSON)'));
+    syncCard.appendChild(syncBtns);
+
+    syncCard.appendChild(h('div', {className:'config-hint', style:{marginTop:'10px'}}, 'El enlace incluye todas tus carpetas, email y nombre de inspector.'));
+    content.appendChild(syncCard);
+
+    // Instructions
+    const instCard = h('div', {className:'card', style:{background:'var(--accent-bg)',border:'1px solid var(--accent-bd)'}});
+    instCard.innerHTML = `
+      <div class="mono" style="font-size:11px;color:var(--text-m);line-height:1.8">
+        <strong style="color:var(--accent)">Pasos en Google Cloud (console.cloud.google.com):</strong><br>
+        1. Proyecto APP POES → <strong>Habilitar APIs</strong> → Google Drive API<br>
+        2. <strong>Credenciales</strong> → Crear ID OAuth 2.0 → Aplicación Web<br>
+        3. En <strong>Orígenes autorizados</strong>, agregar la URL donde alojás esta app<br>
+        4. Copiar el Client ID y pegarlo arriba
+      </div>
+    `;
+    content.appendChild(instCard);
+  }
+
+  // ══ SCRIPT ══
+  else if (state.view === 'script') {
+    content.className = 'content fade-up';
+    content.appendChild(h('button', {className:'btn btn-s btn-ghost', style:{marginBottom:'8px'}, onClick:()=>{state.view='config';render();}}, '← Config'));
+    content.appendChild(h('h1', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'22px',marginBottom:'4px'}}, 'Script de recordatorio'));
+    content.appendChild(h('p', {style:{color:'var(--text-mu)',fontSize:'13px',marginBottom:'16px'}}, 'Pegar en script.google.com'));
+
+    const instCard = h('div', {className:'card', style:{marginBottom:'14px'}});
+    instCard.innerHTML = `<ol style="font-size:12px;color:var(--text-m);line-height:2;padding-left:18px">
+      <li>Ir a <strong>script.google.com</strong> → Nuevo proyecto</li>
+      <li>Pegar el código</li>
+      <li>Activadores → checkSubmissions → Diario</li>
+      <li>Autorizar y listo</li>
+    </ol>`;
+    content.appendChild(instCard);
+
+    const codeCard = h('div', {className:'card'});
+    const codeHeader = h('div', {style:{display:'flex',justifyContent:'space-between',marginBottom:'10px'}});
+    codeHeader.appendChild(h('span', {className:'mono', style:{fontSize:'11px',color:'var(--text-d)'}}, 'Google Apps Script'));
+    codeHeader.appendChild(h('button', {className:'btn btn-s btn-accent', onClick:()=>{navigator.clipboard.writeText(gasCode());showToast('Copiado');}}, '📋 Copiar'));
+    codeCard.appendChild(codeHeader);
+    codeCard.appendChild(h('pre', {className:'script-block'}, gasCode()));
+    content.appendChild(codeCard);
+  }
+
+  app.appendChild(content);
+}
+
+// Las hojas se cargan desde CSVs del repositorio al arrancar.
+// Si ya hay hojas en localStorage, se usan ésas (evita re-fetch en cada carga).
+render();
+if (state.sheets.length === 0) {
+  loadFixedCSVs();
+}
+// Auto-connect to Drive
+autoConnect();
+</script>
+</body>
+</html>
