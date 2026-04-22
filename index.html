@@ -434,15 +434,15 @@ const FIXED_GENERAL_FOLDER = "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe";
 
 // ── CSVs fijos hosteados junto al HTML (precargados desde el repo) ──
 const FIXED_CSVS = [
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Bimestral.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Trimestral.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Semestral.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-Blanchado.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-HPS1.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-HPS2.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-Planta_PE_II.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Diario-Tostado-Pasta-Frito.csv",
-  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLÁSTICOS_11-09-2023_xlsx_-_Planta_Alérgenos.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Bimestral.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Trimestral.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Semestral.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Diario-Blanchado.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Diario-HPS1.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Diario-HPS2.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Diario-Planta_PE_II.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Diario-Tostado-Pasta-Frito.csv",
+  "R-SIG-GVP_01_REGISTRO_DE_CONTROL_DE_VIDRIOS_Y_PLASTICOS_11-09-2023_xlsx_-_Planta_Alergenos.csv",
 ];
 
 async function loadFixedCSVs() {
@@ -1189,13 +1189,11 @@ function removeAttach(id) {
 
 // ── GAS Code ──
 function gasCode() {
-  const h = parseInt(state.config.deadline?.split(':')[0])||9;
-  const m = parseInt(state.config.deadline?.split(':')[1])||0;
   return `// FormVault GVP — Recordatorio
-const FOLDER_ID = "${state.config.folderId||'TU_FOLDER_ID'}";
-const RESPONSIBLE_EMAIL = "${state.config.email||'email@empresa.com'}";
-const DEADLINE_HOUR = ${h};
-const DEADLINE_MINUTE = ${m};
+const FOLDER_ID = "${FIXED_GENERAL_FOLDER}";
+const RESPONSIBLE_EMAIL = "nfernandez@maniagro.com";
+const DEADLINE_HOUR = 9;
+const DEADLINE_MINUTE = 0;
 
 function checkSubmissions() {
   const now = new Date();
@@ -1603,16 +1601,12 @@ function render() {
     const emRow = h('div', {style:{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'12px'}});
     const emDiv = h('div', {style:{flex:'2 1 180px'}});
     emDiv.appendChild(h('label', {className:'config-label'}, 'Email responsable'));
-    const emInput = h('input', {type:'email', placeholder:'email@empresa.com', value:state.config.email});
-    emInput.addEventListener('input', e => { state.config.email = e.target.value; saveConfig(); });
-    emDiv.appendChild(emInput);
+    emDiv.appendChild(h('input', {type:'email', value:'nfernandez@maniagro.com', disabled:true, style:{opacity:'0.7',cursor:'not-allowed'}}));
     emRow.appendChild(emDiv);
 
     const dlDiv = h('div', {style:{flex:'1 1 100px'}});
     dlDiv.appendChild(h('label', {className:'config-label'}, 'Hora límite'));
-    const dlInput = h('input', {type:'time', value:state.config.deadline});
-    dlInput.addEventListener('input', e => { state.config.deadline = e.target.value; saveConfig(); });
-    dlDiv.appendChild(dlInput);
+    dlDiv.appendChild(h('input', {type:'time', value:'09:00', disabled:true, style:{opacity:'0.7',cursor:'not-allowed'}}));
     emRow.appendChild(dlDiv);
     emailCard.appendChild(emRow);
 
