@@ -403,9 +403,11 @@ const FIRMA_NATACHA_B64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALAAAAE
 
 // ── State ──
 const state = {
-  view: 'home', // home | fill | config | script
+  view: 'home', // home | password | fill | config | script
   sheets: JSON.parse(localStorage.getItem('fv_sheets') || '[]'),
   activeSheet: null,
+  pendingSheet: null,
+  pwError: false,
   inspector: localStorage.getItem('fv_inspector') || '',
   controlDate: new Date().toISOString().slice(0,10),
   controlTime: new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),
@@ -528,6 +530,19 @@ const FIXED_FOLDERS = {
   "Semestral": "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe",
 };
 const FIXED_GENERAL_FOLDER = "1OOOcQsGYD2D9QpyQRRvDN9qJmr6yAsHe";
+
+// Contraseñas por sección (clave = nombre exacto de la hoja)
+const SECTION_PASSWORDS = {
+  "Bimestral":              "Bimestral",
+  "Semestral":              "Semestral",
+  "Trimestral":             "Trimestral",
+  "Diario-Blanchado":       "Blanch2026",
+  "Diario-HPS1":            "HPS1.2026",
+  "Diario-HPS2":            "HPS2.2026",
+  "Diario-Planta PE II":    "PE2026",
+  "Diario-Tostado-Pasta-Frito": "Tost2026",
+  "Planta Alérgenos":       "PA2026",
+};
 
 // ── CSVs fijos hosteados junto al HTML (precargados desde el repo) ──
 const FIXED_CSVS = [
@@ -1360,7 +1375,7 @@ function render() {
 
   // Header
   const header = h('div', {className:'header'},
-    h('div', {className:'header-logo', onClick:()=>{state.view='home';state.activeSheet=null;render();}},
+    h('div', {className:'header-logo', onClick:()=>{state.view='home';state.activeSheet=null;state.pendingSheet=null;state.pwError=false;render();}},
       h('img', {src:LOGO_B64, style:{width:'36px',height:'36px',borderRadius:'6px',objectFit:'cover'}}),
       h('div', null,
         h('span', {className:'name'}, 'Maniagro'),
@@ -1449,7 +1464,7 @@ function render() {
         else { freqClass = 'freq-diario'; dotColor = '#B34033'; }
 
         const card = h('div', {className:'sheet-card '+freqClass, style:{animationDelay:(i*.06)+'s'}, onClick:()=>{
-          state.activeSheet = s; state.view='fill'; state.attachedFiles=[]; state.controlDate=new Date().toISOString().slice(0,10); state.controlTime=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); state.generalObs=''; state.signatureData=null; render();
+          state.pendingSheet = s; state.pwError = false; state.view='password'; render();
         }});
         card.appendChild(h('div', {className:'freq'}, h('span',{className:'dot',style:{background:dotColor}}), (s.meta.frequency||'—').toUpperCase()));
         card.appendChild(h('div', {className:'sname'}, displayName(s.name)));
@@ -1477,6 +1492,71 @@ function render() {
         });
       }
     }
+  }
+
+  // ══ PASSWORD ══
+  else if (state.view === 'password' && state.pendingSheet) {
+    const ps = state.pendingSheet;
+    const sectionName = displayName(ps.name);
+    const freq = (ps.meta.frequency||'').toLowerCase();
+    let gradient, dotColor, freqLabel;
+    if (freq.includes('bimestral')) { gradient='linear-gradient(145deg,#6B3F8A,#9B6BBF)'; dotColor='#7B4F9B'; freqLabel='BIMESTRAL'; }
+    else if (freq.includes('trimestral')) { gradient='linear-gradient(145deg,#1B5E99,#3A8FD4)'; dotColor='#2E6FB8'; freqLabel='TRIMESTRAL'; }
+    else if (freq.includes('semestral')) { gradient='linear-gradient(145deg,#1B6B35,#3A9E5A)'; dotColor='#4A8556'; freqLabel='SEMESTRAL'; }
+    else { gradient='linear-gradient(145deg,#B34033,#D4634A)'; dotColor='#B34033'; freqLabel=(ps.meta.frequency||'DIARIO').toUpperCase(); }
+
+    content.className = 'content fade-up';
+    content.appendChild(h('button', {className:'btn btn-s btn-ghost', style:{marginBottom:'12px'}, onClick:()=>{state.view='home';state.pendingSheet=null;state.pwError=false;render();}}, '← Volver'));
+
+    const wrap = h('div', {style:{maxWidth:'420px',margin:'8px auto 0'}});
+
+    // Banner con gradiente de la sección
+    const banner = h('div', {style:{background:gradient,borderRadius:'14px',padding:'22px 22px',color:'#fff',marginBottom:'18px',boxShadow:'0 6px 18px rgba(0,0,0,.12)',position:'relative',overflow:'hidden'}});
+    banner.appendChild(h('div', {style:{display:'flex',alignItems:'center',gap:'7px',fontSize:'10px',fontWeight:'600',letterSpacing:'.08em',opacity:'.85',marginBottom:'10px'}},
+      h('span', {style:{width:'6px',height:'6px',borderRadius:'50%',background:'rgba(255,255,255,.8)'}}),
+      freqLabel
+    ));
+    banner.appendChild(h('div', {style:{fontFamily:"'Instrument Serif',serif",fontSize:'28px',lineHeight:'1.1'}}, sectionName));
+    banner.appendChild(h('div', {style:{fontSize:'12px',opacity:'.8',marginTop:'8px'}}, ps.items.length+' ítems · acceso restringido'));
+    wrap.appendChild(banner);
+
+    // Tarjeta de contraseña
+    const card = h('div', {style:{background:'var(--surface)',border:'1.5px solid var(--border)',borderRadius:'14px',padding:'22px 20px',boxShadow:'0 2px 8px rgba(15,42,69,.04)'}});
+    card.appendChild(h('label', {style:{display:'block',fontSize:'12px',fontWeight:'600',color:'var(--text-m)',marginBottom:'8px',letterSpacing:'.02em'}}, '🔒  Contraseña de acceso'));
+
+    const inp = h('input', {type:'password', placeholder:'Ingresá la contraseña', autocomplete:'off', style:{marginBottom:'6px'}});
+    card.appendChild(inp);
+
+    const errSlot = h('div', {style:{minHeight:'20px',marginBottom:'10px',fontSize:'12.5px',color:'var(--nc)',display:'flex',alignItems:'center',gap:'5px'}});
+    if (state.pwError) errSlot.appendChild(document.createTextNode('✗ Contraseña incorrecta. Intentá de nuevo.'));
+    card.appendChild(errSlot);
+
+    const confirmBtn = h('button', {className:'btn btn-accent btn-full', style:{marginTop:'4px'}}, 'Ingresar →');
+    confirmBtn.addEventListener('click', () => {
+      const pw = inp.value;
+      const expected = SECTION_PASSWORDS[ps.name];
+      if (!expected || pw === expected) {
+        state.activeSheet = ps;
+        state.pendingSheet = null;
+        state.pwError = false;
+        state.attachedFiles = [];
+        state.controlDate = new Date().toISOString().slice(0,10);
+        state.controlTime = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+        state.generalObs = '';
+        state.signatureData = null;
+        state.view = 'fill';
+        render();
+      } else {
+        state.pwError = true; render();
+        setTimeout(() => { const ni = document.querySelector('input[type=password]'); if(ni){ni.focus();ni.select();} }, 50);
+      }
+    });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click(); });
+    card.appendChild(confirmBtn);
+    wrap.appendChild(card);
+
+    content.appendChild(wrap);
+    setTimeout(() => { const ni = document.querySelector('input[type=password]'); if(ni) ni.focus(); }, 60);
   }
 
   // ══ FILL ══
